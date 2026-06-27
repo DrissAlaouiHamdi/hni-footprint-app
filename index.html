@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HNI Corporation — Salesforce Portfolio Footprint</title>
+<style>
+/* === RESET & BASE === */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Salesforce Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: #f4f6fa;
+  color: #1a1a2e;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* === HEADER === */
+.header {
+  background: linear-gradient(135deg, #0b1c3f 0%, #0d2a5c 60%, #14366e 100%);
+  color: #fff;
+  padding: 12px 48px;
+  position: relative;
+}
+.header-content {
+  position: relative;
+  z-index: 1;
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.header-left h1 {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+}
+.header-left .subtitle {
+  font-size: 13px;
+  opacity: 0.7;
+  font-weight: 400;
+  white-space: nowrap;
+}
+.header-left .meta {
+  font-size: 11px;
+  opacity: 0.5;
+  white-space: nowrap;
+}
+.header-badge {
+  display: inline-block;
+  background: rgba(1,118,211,0.25);
+  border: 1px solid rgba(1,118,211,0.45);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+/* === CONTAINER === */
+.container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 48px 48px;
+}
+
+/* === FILTER BAR === */
+.filter-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.filter-band {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+}
+.filter-band-categories {
+  background: #fff;
+  border-bottom: 1px solid #e2e5ea;
+}
+.filter-band-brands {
+  background: #f0f3f7;
+  border-bottom: 1px solid #d8dce3;
+}
+.filter-band-actions {
+  background: #fff;
+  border-bottom: 2px solid #e2e5ea;
+  padding: 8px 28px;
+}
+.filter-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #6b7280;
+  margin-right: 4px;
+}
+.filter-separator {
+  width: 1px;
+  height: 28px;
+  background: #e0e0e0;
+  margin: 0 10px;
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 13px;
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid #d1d5db;
+  background: #fff;
+  color: #374151;
+  transition: all 0.15s ease;
+  user-select: none;
+  white-space: nowrap;
+}
+.pill:hover {
+  border-color: #9ca3af;
+  background: #f9fafb;
+}
+.pill.active {
+  border-color: currentColor;
+  color: #fff;
+}
+.pill.category-pill { border-color: transparent; }
+.pill.category-pill:not(.active) {
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+}
+.pill.brand-pill:not(.active) {
+  background: #f8f9fa;
+}
+.pill.brand-pill.active {
+  background: #0b1c3f;
+  border-color: #0b1c3f;
+  color: #fff;
+}
+.pill-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.pill-clear {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+.pill-clear:hover { background: #fecaca; }
+.pill-whitespace {
+  background: #f5f5f5;
+  border: 1.5px dashed #9ca3af;
+  color: #6b7280;
+}
+.pill-whitespace.active {
+  background: #fef3c7;
+  border-color: #f59e0b;
+  color: #92400e;
+}
+
+/* === HEATMAP === */
+.heatmap-section {
+  background: #fff;
+  border-radius: 14px;
+  margin-top: 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05), 0 6px 20px rgba(0,0,0,0.03);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 160px);
+}
+.heatmap-wrapper {
+  overflow: auto;
+  padding: 0 24px 24px;
+  flex: 1;
+}
+.heatmap-table {
+  border-collapse: separate;
+  border-spacing: 2px;
+  width: 100%;
+  margin-top: 0;
+  table-layout: auto;
+}
+
+/* Detail insert rows */
+.detail-insert-row td {
+  padding: 6px 0 !important;
+  background: transparent !important;
+  border: none !important;
+}
+.detail-row-container {
+  position: relative;
+  display: flex;
+  gap: 0;
+  width: 100%;
+  overflow: hidden;
+}
+.detail-row-left, .detail-row-right {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 24px 6px 8px;
+  align-content: flex-start;
+}
+.detail-row-left {
+  border-right: 1px dashed #d0d5dd;
+  justify-content: flex-start;
+}
+.detail-row-right {
+  justify-content: flex-end;
+}
+.detail-row-container svg.connector-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* Column headers - tilted and sticky */
+.heatmap-table thead tr {
+  height: 140px;
+}
+.heatmap-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: #fff;
+  vertical-align: bottom;
+  padding: 0;
+  min-width: 68px;
+  width: 68px;
+  text-align: left;
+}
+.heatmap-table thead th:first-child {
+  min-width: 200px;
+  width: 200px;
+  z-index: 51;
+}
+.heatmap-table thead th .col-label {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform-origin: bottom left;
+  transform: rotate(-50deg);
+  white-space: nowrap;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #1a1a2e;
+  letter-spacing: -0.2px;
+}
+
+/* Row labels */
+.heatmap-table tbody td:first-child {
+  padding: 0 12px 0 0;
+  white-space: nowrap;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #1a1a2e;
+  text-align: right;
+  vertical-align: middle;
+  min-width: 200px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.heatmap-table tbody td:first-child:hover {
+  color: #0176d3;
+}
+.heatmap-table tbody td:first-child .cat-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* Heatmap cells */
+.heatmap-cell {
+  width: 68px;
+  height: 44px;
+  text-align: center;
+  vertical-align: middle;
+  padding: 0;
+  position: relative;
+}
+.cell-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 44px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  transition: transform 0.12s, box-shadow 0.12s;
+  position: relative;
+  cursor: default;
+}
+.cell-inner:hover {
+  transform: scale(1.08);
+  box-shadow: 0 3px 12px rgba(0,0,0,0.2);
+  z-index: 10;
+}
+.cell-inner.empty {
+  background: #f5f5f5;
+  border: 1px dashed #d4d4d4;
+  color: #c0c0c0;
+  font-size: 14px;
+  font-weight: 400;
+}
+.cell-inner.filled {
+  color: #fff;
+}
+.cell-inner.filled.light-text {
+  color: #1a1a2e;
+}
+.clickable-cell {
+  cursor: pointer;
+  position: relative;
+  flex-direction: column;
+}
+.clickable-cell:active { transform: scale(0.95); }
+.cell-prod-count {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  font-size: 9.5px;
+  font-weight: 700;
+  opacity: 0.9;
+  padding: 0;
+  line-height: 1.3;
+}
+/* Detail panel cards */
+.detail-card {
+  position: relative;
+  width: 220px;
+  min-width: 180px;
+  flex: 0 1 220px;
+  max-height: none;
+  overflow: visible;
+  background: #fff;
+  border: 2px solid #0176d3;
+  border-top: 5px solid #0176d3;
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+.detail-card-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #e8eaef;
+}
+.detail-card-header h4 {
+  font-size: 10px;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0;
+  white-space: nowrap;
+}
+.detail-card-header .detail-card-brand {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: #0176d3;
+  color: #fff;
+  white-space: nowrap;
+  flex: 1;
+  text-align: center;
+}
+.detail-card .detail-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.detail-card .detail-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 10.5px;
+  break-inside: avoid;
+}
+.detail-card .detail-list li:last-child { border-bottom: none; }
+.detail-item-name { color: #1a1a2e; font-weight: 500; flex: 1; margin-right: 6px; line-height: 1.3; word-break: break-word; white-space: normal; }
+.detail-item-qty { color: #0176d3; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+.detail-card-close {
+  background: none;
+  border: none;
+  font-size: 15px;
+  cursor: pointer;
+  color: #9ca3af;
+  line-height: 1;
+  padding: 0 0 0 8px;
+}
+.detail-card-close:hover { color: #dc2626; }
+
+/* Highlight the source cell when detail is open */
+.cell-active-source {
+  outline: 3px solid currentColor !important;
+  outline-offset: 2px;
+  z-index: 20 !important;
+  position: relative;
+}
+
+.heatmap-cell { position: relative; overflow: visible; }
+
+/* Total row */
+.heatmap-table tbody tr.total-row td {
+  border-top: 3px solid #0b1c3f;
+  padding-top: 8px;
+}
+.heatmap-table tbody tr.total-row td:first-child {
+  font-weight: 800;
+  font-size: 13px;
+  color: #0b1c3f;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.heatmap-table tbody tr.total-row .cell-inner {
+  background: #0b1c3f !important;
+  color: #fff !important;
+  font-size: 11px;
+  font-weight: 800;
+  border-radius: 5px;
+}
+
+/* Expanded sub-rows */
+.sub-row td:first-child {
+  font-weight: 400 !important;
+  font-size: 11px !important;
+  color: #6b7280 !important;
+  padding-left: 24px !important;
+  text-align: right !important;
+}
+.sub-row .cell-inner {
+  height: 32px;
+  font-size: 10px;
+  border-radius: 3px;
+}
+.sub-row {
+  display: none;
+}
+.sub-row.visible {
+  display: table-row;
+}
+
+/* Row dimming for filters */
+.heatmap-table tbody tr.dimmed td:first-child { opacity: 0.3; }
+.heatmap-table tbody tr.dimmed .cell-inner { opacity: 0.15; }
+.heatmap-table thead th.dimmed .col-label { opacity: 0.25; }
+.heatmap-table tbody tr:not(.dimmed) .cell-inner.col-dimmed { opacity: 0.15; }
+
+/* White space highlight */
+.cell-inner.empty.ws-highlight {
+  border: 2px solid #f59e0b;
+  background: #fffbeb;
+  animation: pulse-ws 1.5s infinite;
+}
+@keyframes pulse-ws {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.3); }
+  50% { box-shadow: 0 0 0 4px rgba(245,158,11,0.1); }
+}
+
+/* Row total column */
+.row-total-cell {
+  text-align: center;
+  vertical-align: middle;
+  padding: 4px 8px;
+  white-space: nowrap;
+}
+.row-total-cell .total-badge {
+  display: inline-block;
+  background: #0b1c3f;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 6px;
+  min-width: 54px;
+  text-align: center;
+}
+.total-row .row-total-cell .total-badge {
+  background: #0176d3;
+  font-size: 13px;
+  padding: 6px 14px;
+  font-weight: 900;
+}
+.heatmap-table thead th.total-col-header {
+  min-width: 80px;
+  width: 80px;
+}
+.heatmap-table thead th.total-col-header .col-label {
+  font-size: 10px;
+  color: #6b7280;
+  transform: none;
+  position: static;
+  writing-mode: horizontal-tb;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Tooltip - hidden */
+.tooltip {
+  display: none !important;
+}
+.tooltip-hidden {
+  position: fixed;
+  background: #1a1a2e;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.6;
+  pointer-events: none;
+  z-index: 9999;
+  max-width: 280px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  display: none;
+  transition: opacity 0.1s;
+}
+.tooltip.visible { display: block; }
+.tooltip-brand { font-weight: 700; color: #93c5fd; }
+.tooltip-cat { font-weight: 600; color: #a5f3fc; }
+.tooltip-count { color: #d1d5db; }
+
+
+/* === PRINT === */
+@media print {
+  .filter-bar { display: none; }
+  .header { padding: 20px 30px; }
+  .container { padding: 0 20px; }
+  .heatmap-section { box-shadow: none; border: 1px solid #e0e0e0; }
+  .cell-inner:hover { transform: none; box-shadow: none; }
+  .ws-summary { page-break-before: always; }
+  body { background: #fff; }
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 1024px) {
+  .header { padding: 24px; }
+  .container { padding: 0 16px 32px; }
+  .filter-bar { padding: 12px 16px; }
+  .ws-summary { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-content">
+    <div class="header-left">
+      <h1>HNI Corporation</h1>
+      <div class="subtitle">Salesforce Portfolio Footprint</div>
+      <div class="meta">11 Orgs &middot; 15 Clouds &middot; 114 Products</div>
+    </div>
+    <div class="header-badge">Data as of June 2026</div>
+  </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="filter-bar" id="filterBar">
+  <div class="filter-band filter-band-categories">
+    <span class="filter-section-label">Cloud</span>
+    <div id="categoryPills" style="display:contents;"></div>
+  </div>
+  <div class="filter-band filter-band-brands">
+    <span class="filter-section-label">Brand</span>
+    <div id="brandPills" style="display:contents;"></div>
+  </div>
+  <div class="filter-band filter-band-actions">
+    <span class="pill pill-whitespace" id="wsToggle">White Space Only</span>
+    <span class="pill pill-clear" id="clearAll">Clear All</span>
+  </div>
+</div>
+
+<!-- Heatmap -->
+<div class="container">
+  <div class="heatmap-section">
+    <div class="heatmap-wrapper">
+      <table class="heatmap-table" id="heatmapTable"></table>
+    </div>
+  </div>
+
+</div>
+
+
+<script>
+// === DATA ===
+const DATA = [
+  ['HNI - Workplace Furnishings','00D37000000IozJEAS','AIfe - Opportunity Scoring','Sales & Service Cloud',1],
+  ['HNI - Workplace Furnishings','1007213','Additional Contacts - Corporate Edition (1,000)','Marketing Cloud',764],
+  ['HNI - Workplace Furnishings','1007213','Marketing Cloud Advertising - Additional Audiences','Marketing Cloud',5],
+  ['HNI - Workplace Furnishings','1007213','Marketing Cloud Advertising Professional','Marketing Cloud',1],
+  ['HNI - Workplace Furnishings','1007213','Marketing Cloud Advertising Professional - Contacts (1,000)','Marketing Cloud',81],
+  ['HNI - Workplace Furnishings','1007213','Marketing Cloud Engagement - Corporate Edition - Core/Advanced','Marketing Cloud',1],
+  ['HNI - Workplace Furnishings','1007213','Premier Success Plan - Marketing Cloud Engagement','Premier Success',1],
+  ['HNI - Workplace Furnishings','1007213','Private IP / Dedicated IP','Marketing Cloud',1],
+  ['HNI - Workplace Furnishings','1007213','SSL Certificate','Marketing Cloud',18],
+  ['HNI - Workplace Furnishings','1448521','Additional Business Unit (+1)','Marketing Cloud',6],
+  ['HNI - Workplace Furnishings','1448521','Additional Contacts - Corporate Edition (1,000)','Marketing Cloud',329],
+  ['HNI - Workplace Furnishings','1448521','Marketing Cloud Engagement - Corporate Edition','Marketing Cloud',1],
+  ['HNI - Workplace Furnishings','1448521','Premier Success Plan - Marketing Cloud Engagement','Premier Success',1],
+  ['HNI - Workplace Furnishings','1482088','Marketing Cloud Engagement - Corporate Edition','Marketing Cloud',1],
+  ['HNI - Workplace Furnishings','1482088','Premier Success Plan - Marketing Cloud Engagement','Premier Success',1],
+  ['HNI - Workplace Furnishings','148660','Additional Business Unit (+1)','Marketing Cloud',1],
+  ['HNI - Workplace Furnishings','148660','Marketing Cloud Engagement - Corporate Edition','Marketing Cloud',1],
+  ['Heatilator,Heat-N-Glo,Aladdin Hearth','00D30000000JsDhEAK','Agentforce for Sales Add-on - Unlimited Edition','Agentforce',3],
+  ['Heatilator,Heat-N-Glo,Aladdin Hearth','00D30000000JsDhEAK','Content for Partner Portal and Customer Portal','Experience Cloud',9541],
+  ['Heatilator,Heat-N-Glo,Aladdin Hearth','00D30000000JsDhEAK','Customer Community - Unlimited Edition - Logins (Per Month)','Experience Cloud',1],
+  ['Heatilator,Heat-N-Glo,Aladdin Hearth','00D30000000JsDhEAK','Customer Portal - Unlimited Edition (Named User)','Experience Cloud',9541],
+  ['Heatilator,Heat-N-Glo,Aladdin Hearth','00D30000000JsDhEAK','Data Cloud Provisioning','Data Cloud',1],
+  ['Heatilator,Heat-N-Glo,Aladdin Hearth','00D30000000JsDhEAK','Data Storage (10GB)','Platform',5],
+  ['Heatilator,Heat-N-Glo,Aladdin Hearth','00D30000000JsDhEAK','Data Storage (500MB)','Platform',3],
+  ['Heatilator,Heat-N-Glo,Aladdin Hearth','00D30000000JsDhEAK','Microsoft Teams Integration','Platform',1],
+  ['Heatilator,Heat-N-Glo,Aladdin Hearth','00D30000000JsDhEAK','Mobile Publisher for Logins (Per Month)','Experience Cloud',11000],
+  ['Heatilator,Heat-N-Glo,Aladdin Hearth','00D30000000JsDhEAK','Sales & Service Cloud - Unlimited Edition (Service)','Sales & Service Cloud',294],
+  ['Heatilator,Heat-N-Glo,Aladdin Hearth','00D30000000JsDhEAK','Salesforce Connect','Platform',1],
+  ['Heatilator,Heat-N-Glo,Aladdin Hearth','00D30000000JsDhEAK','Salesforce Foundations','Foundations',1],
+  ['Heatilator,Heat-N-Glo,Aladdin Hearth','00D30000000JsDhEAK','Salesforce Foundations - Entitlements - Flex Credits','Foundations',1],
+  ['HNI - Workplace Furnishings','00D37000000IozJEAS','Analytics - 5 Additional Dynamic Dashboards','Sales & Service Cloud',2],
+  ['HNI - Workplace Furnishings','00D37000000IozJEAS','Data Cloud Provisioning','Data Cloud',1],
+  ['HNI - Workplace Furnishings','00D37000000IozJEAS','Data Services Provisioning - Agentforce 1 Edition','Agentforce',1],
+  ['HNI - Workplace Furnishings','00D37000000IozJEAS','Developer Productivity - Unlimited Edition','Agentforce',6],
+  ['HNI - Workplace Furnishings','00D37000000IozJEAS','External Apps - Unlimited Edition - Logins (Per Month) - LP','Experience Cloud',14000],
+  ['HNI - Workplace Furnishings','00D37000000IozJEAS','External Apps - Unlimited Edition - Members - LP','Experience Cloud',3840],
+  ['HNI - Workplace Furnishings','00D37000000IozJEAS','Flex - Entitlements - Agentforce 1 Edition - LP','Agentforce',1],
+  ['HNI - Workplace Furnishings','00D37000000IozJEAS','MC Account Engagement - Advanced - Additional Contacts (10,000)','Marketing Cloud',14],
+  ['HNI - Workplace Furnishings','00D37000000IozJEAS','Marketing Cloud Account Engagement - Advanced','Marketing Cloud',1],
+  ['HNI - Workplace Furnishings','00D37000000IozJEAS','Mobile Publisher for Employees and Members','Experience Cloud',3840],
+  ['HNI - Workplace Furnishings','00D37000000IozJEAS','Mobile Publisher for Logins (Per Month)','Experience Cloud',14000],
+  ['HNI - Workplace Furnishings','00D37000000IozJEAS','Premier Success Plan - Marketing Cloud Account Engagement - RP','Premier Success',0],
+  ['HNI - Workplace Furnishings','00D37000000IozJEAS','Sales & Service Cloud - Unlimited Edition (Service)','Sales & Service Cloud',793],
+  ['HNI - Workplace Furnishings','00D37000000IozJEAS','Salesforce Connect','Platform',2],
+  ['HNI - Workplace Furnishings','00D37000000IozJEAS','Service Cloud - Agentforce 1 Edition','Service Cloud Agentforce',65],
+  ['HNI - Workplace Furnishings','00D37000000IozJEAS','Service Provisioning for Agentforce 1 Edition','Service Cloud Agentforce',1],
+  ['HNI - Workplace Furnishings','E09TW39BY06','Slack Provisioning - Agentforce 1 Edition/Einstein 1 Edition','Slack',65],
+  ['Steelcase MAIN','00D37000000FI4dEAG','Additional Orders - B2B Commerce - LP','Commerce',2100],
+  ['Steelcase MAIN','00D37000000FI4dEAG','Additional Storefront - B2B Commerce - LP','Commerce',2],
+  ['Steelcase MAIN','00D37000000FI4dEAG','Analytics - 5 Additional Dynamic Dashboards','Sales & Service Cloud',1],
+  ['Steelcase MAIN','00D37000000FI4dEAG','B2B Commerce Platform - Unlimited Edition - LP','Commerce',1],
+  ['Steelcase MAIN','00D37000000FI4dEAG','Customer Community Plus - Unlimited Edition - Logins (Per Month)','Experience Cloud',12000],
+  ['Steelcase MAIN','00D37000000FI4dEAG','Customer Community Plus - Unlimited Edition - Members','Experience Cloud',5350],
+  ['Steelcase MAIN','00D37000000FI4dEAG','Data Cloud Provisioning','Data Cloud',1],
+  ['Steelcase MAIN','00D37000000FI4dEAG','Lightning Platform - Unlimited Edition (Administrator)','Platform',10],
+  ['Steelcase MAIN','00D37000000FI4dEAG','Lightning Platform Starter - Unlimited Edition','Platform',170],
+  ['Steelcase MAIN','00D37000000FI4dEAG','Microsoft Teams Integration','Platform',1],
+  ['Steelcase MAIN','00D37000000FI4dEAG','Partner Community - Unlimited Edition - Members','Experience Cloud',75],
+  ['Steelcase MAIN','00D37000000FI4dEAG','Sales & Service Cloud - Unlimited Edition','Sales & Service Cloud',1492],
+  ['Steelcase MAIN','00D37000000FI4dEAG','Salesforce Connect','Platform',1],
+  ['HNI India','00D6A000000wcE1UAI','Sales & Service Cloud - Unlimited Edition (Service)','Sales & Service Cloud',41],
+  ['(Unassigned)','a646Q000002niZAQAY','Tableau Cloud - Creator','Tableau',1],
+  ['HNI - Workplace Furnishings','a640d000000CKWnAAO','Tableau - Creator (Server)','Tableau',6],
+  ['Fireside Hearth & Home','00DfI000008xwN5UAI','Sales & Service Cloud - Unlimited Edition','Sales & Service Cloud',96],
+  ['Fireside Hearth & Home','00DfI000008xwN5UAI','Salesforce Maps - Unlimited Edition','Maps',60],
+  ['Heatilator,Heat-N-Glo,Aladdin Hearth','recover_hipaa4_1001019','Own Accelerate (Azure)','Own',294],
+  ['Heatilator,Heat-N-Glo,Aladdin Hearth','recover_hipaa4_1001019','Own Recover (Azure)','Own',294],
+  ['Heatilator,Heat-N-Glo,Aladdin Hearth','','Own Premier Support','Own',294],
+  ['Heatilator,Heat-N-Glo,Aladdin Hearth','','Own Unlimited for Salesforce - Members','Own',10000],
+  ['Steelcase MAIN','archive_hipaa4_00DHp000001srnJMAQ','Own Archive (Azure)','Own',251],
+  ['Steelcase MAIN','recover_hipaa4_1000156','Own Accelerate (Azure)','Own',1601],
+  ['Steelcase MAIN','recover_hipaa4_1000156','Own Archive Console (Azure)','Own',1],
+  ['Steelcase MAIN','recover_hipaa4_1000156','Own Recover (Azure)','Own',1661],
+  ['Steelcase MAIN','','Own Unlimited for Salesforce - Logins','Own',250000],
+  ['Steelcase MAIN','','Own Unlimited for Salesforce - Members','Own',50000],
+  ['Kimball International Global Org','00D5e0000012wvaEAA','Agentforce for Sales Add-on - Unlimited Edition','Agentforce',10],
+  ['Kimball International Global Org','00D5e0000012wvaEAA','Agentforce for Service Add-on - Unlimited Edition','Agentforce',40],
+  ['Kimball International Global Org','00D5e0000012wvaEAA','Customer Community Plus - Unlimited Edition - Logins (Per Month)','Experience Cloud',7000],
+  ['Kimball International Global Org','00D5e0000012wvaEAA','Data Cloud Provisioning','Data Cloud',1],
+  ['Kimball International Global Org','00D5e0000012wvaEAA','Digital Engagement - Unlimited Edition - LP1','Marketing Cloud',14],
+  ['Kimball International Global Org','00D5e0000012wvaEAA','File Storage (1TB)','Platform',1],
+  ['Kimball International Global Org','00D5e0000012wvaEAA','Flex Credits (100k)','Platform',200],
+  ['Kimball International Global Org','00D5e0000012wvaEAA','Sales & Service Cloud - Unlimited Edition','Sales & Service Cloud',380],
+  ['Kimball International Global Org','00D5e0000012wvaEAA','Salesforce Foundations','Platform',1],
+  ['Kimball International Global Org','00D5e0000012wvaEAA','Salesforce Foundations - Entitlements - Flex Credits','Platform',1],
+  ['Kimball Hospitality Furniture Inc','00D4T000000F3VzUAK','Sales & Service Cloud - Unlimited Edition','Sales & Service Cloud',85],
+  ['Kimball International Global Org','00D5e0000012wvaEAA','Distributed Marketing','Marketing Cloud',150],
+  ['Kimball International Global Org','bjwn','B2C Commerce - On Demand Sandbox Credits (50K)','Commerce',200],
+  ['Kimball International Global Org','bjwn','B2C Commerce - Plus - GMV (10,000)','Commerce',600],
+  ['Kimball International Global Org','bjwn','B2C Commerce - Plus - On Demand Sandbox Credits (2M/year)','Commerce',1],
+  ['National Office Furniture','524000156','Email File Attachments (1,000)','Platform',1],
+  ['National Office Furniture','524000156','Marketing Cloud Engagement - Corporate Edition','Marketing Cloud',1],
+  ['National Office Furniture','524000156','Premier Success Plan - Marketing Cloud Engagement','Premier Success',1],
+  ['National Office Furniture','524000156','Private Domain','Marketing Cloud',2],
+  ['National Office Furniture','524000156','SMS/MMS Code Lease - No charge with Edition','Marketing Cloud',1],
+  ['National Office Furniture','524000156','SMS/MMS Mobile Messages (1,000)','Marketing Cloud',60],
+  ['National Office Furniture','524000156','SSL Certificate','Marketing Cloud',8],
+  ['National Office Furniture','524009175','Marketing Cloud Engagement - Pro Edition','Marketing Cloud',1],
+  ['National Office Furniture','524009175','SSL Certificate','Marketing Cloud',4],
+  ['National Office Furniture','524009175','Sender Authentication Package','Marketing Cloud',1],
+  ['(Unassigned)','T02P4L1Q2MV','Slack Enterprise Select','Slack',12],
+  ['(Unassigned)','T02P4L1Q2MV','Slack HIPAA Enabled','Slack',1],
+  ['Steelcase MAIN','a640d000000CKEdAAO','Tableau - Creator (Server)','Tableau',280],
+  ['Steelcase MAIN','a640d000000CKEdAAO','Tableau - Explorer (Server)','Tableau',250],
+  ['Steelcase MAIN','a640d000000CKEdAAO','Tableau - Viewer (Server)','Tableau',2575],
+  ['Heatilator,Heat-N-Glo,Aladdin Hearth','a640d000001B54iAAC','Tableau Cloud - Creator','Tableau',42],
+  ['Heatilator,Heat-N-Glo,Aladdin Hearth','a640d000001B54iAAC','Tableau Cloud - Data Mgmt','Tableau',1],
+  ['Heatilator,Heat-N-Glo,Aladdin Hearth','a640d000001B54iAAC','Tableau Cloud - Data Mgmt - Resource Block','Tableau',1],
+  ['Heatilator,Heat-N-Glo,Aladdin Hearth','a640d000001B54iAAC','Tableau Cloud - Explorer','Tableau',95],
+  ['Heatilator,Heat-N-Glo,Aladdin Hearth','a640d000001B54iAAC','Tableau Cloud - Viewer','Tableau',70],
+  ['Kimball International Global Org','00D5e0000012wvaEAA','Courtesy Sandbox','Platform',1],
+  ['Steelcase Proxy Org','US-bdd08936-c1e1-42a2-ac64-2ee91bd0ac76','MuleSoft - Automation - Anypoint Platform','MuleSoft',1],
+  ['Steelcase Proxy Org','US-bdd08936-c1e1-42a2-ac64-2ee91bd0ac76','MuleSoft - Automation for Salesforce - Titanium Edition (57,000 Credits)','MuleSoft',1],
+  ['Steelcase Proxy Org','US-bdd08936-c1e1-42a2-ac64-2ee91bd0ac76','MuleSoft - Automation - Composer for Salesforce - LP','MuleSoft',1],
+];
+
+// === CONFIGURATION ===
+const BRANDS = [
+  'HNI - Workplace Furnishings',
+  'Steelcase MAIN',
+  'Steelcase Proxy Org',
+  'Kimball International Global Org',
+  'Kimball Hospitality Furniture Inc',
+  'Heatilator,Heat-N-Glo,Aladdin Hearth',
+  'Fireside Hearth & Home',
+  'HNI India',
+  'National Office Furniture',
+  '(Unassigned)'
+];
+
+const BRAND_SHORT = {
+  'HNI - Workplace Furnishings': 'HNI Workplace',
+  'Steelcase MAIN': 'Steelcase',
+  'Steelcase Proxy Org': 'Steelcase Proxy',
+  'Kimball International Global Org': 'Kimball Intl',
+  'Kimball Hospitality Furniture Inc': 'Kimball Hospitality',
+  'Heatilator,Heat-N-Glo,Aladdin Hearth': 'Hearth & Home',
+  'Fireside Hearth & Home': 'Fireside',
+  'HNI India': 'HNI India',
+  'National Office Furniture': 'Natl Office Furn',
+  '(Unassigned)': 'Unassigned'
+};
+
+const ALL_CATEGORIES = [
+  'Sales & Service Cloud',
+  'Service Cloud Agentforce',
+  'Agentforce',
+  'Marketing Cloud',
+  'Experience Cloud',
+  'Commerce',
+  'Data Cloud',
+  'Platform',
+  'Tableau',
+  'Maps',
+  'Slack',
+  'MuleSoft',
+  'Own',
+  'Foundations',
+  'Premier Success'
+];
+
+function getSortedCategories() {
+  const { matrix } = buildHeatmapDataRaw();
+  return [...ALL_CATEGORIES].sort((a, b) => {
+    const countA = BRANDS.filter(br => matrix[a][br] > 0).length;
+    const countB = BRANDS.filter(br => matrix[b][br] > 0).length;
+    return countB - countA;
+  });
+}
+
+function getSortedBrands() {
+  const { matrix } = buildHeatmapDataRaw();
+  return [...BRANDS].sort((a, b) => {
+    const countA = ALL_CATEGORIES.filter(cat => matrix[cat][a] > 0).length;
+    const countB = ALL_CATEGORIES.filter(cat => matrix[cat][b] > 0).length;
+    return countB - countA;
+  });
+}
+
+let CATEGORIES = ALL_CATEGORIES;
+let SORTED_BRANDS = BRANDS;
+
+const CAT_COLORS = {
+  'Sales & Service Cloud': '#0176d3',
+  'Service Cloud Agentforce': '#1b5e20',
+  'Agentforce': '#00c853',
+  'Marketing Cloud': '#ff6d00',
+  'Experience Cloud': '#00bfa5',
+  'Commerce': '#e91e63',
+  'Data Cloud': '#2962ff',
+  'Platform': '#7c4dff',
+  'Tableau': '#1de9b6',
+  'Maps': '#ffd600',
+  'Slack': '#611f69',
+  'MuleSoft': '#00b0ff',
+  'Own': '#546e7a',
+  'Foundations': '#8d6e63',
+  'Premier Success': '#78909c'
+};
+
+// === STATE ===
+let activeCategories = new Set();
+let activeBrands = new Set();
+let wsMode = false;
+let expandedRows = new Set();
+
+// === HELPERS ===
+function formatNum(n) {
+  if (n === 0) return '0';
+  if (n >= 100000) return (n / 1000).toFixed(0) + 'K';
+  if (n >= 10000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+  if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+  return n.toString();
+}
+
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3), 16);
+  const g = parseInt(hex.slice(3,5), 16);
+  const b = parseInt(hex.slice(5,7), 16);
+  return { r, g, b };
+}
+
+function getIntensityColor(baseHex, intensity) {
+  // intensity: 0 (lightest) to 1 (full color)
+  const { r, g, b } = hexToRgb(baseHex);
+  const factor = 0.08 + intensity * 0.92; // range from 8% to 100%
+  const nr = Math.round(255 - (255 - r) * factor);
+  const ng = Math.round(255 - (255 - g) * factor);
+  const nb = Math.round(255 - (255 - b) * factor);
+  return `rgb(${nr},${ng},${nb})`;
+}
+
+function isLightColor(baseHex, intensity) {
+  // Determine if text should be dark on this background
+  const { r, g, b } = hexToRgb(baseHex);
+  const factor = 0.08 + intensity * 0.92;
+  const nr = Math.round(255 - (255 - r) * factor);
+  const ng = Math.round(255 - (255 - g) * factor);
+  const nb = Math.round(255 - (255 - b) * factor);
+  const luminance = (0.299 * nr + 0.587 * ng + 0.114 * nb) / 255;
+  return luminance > 0.6;
+}
+
+// === BUILD HEATMAP DATA ===
+function buildHeatmapDataRaw() {
+  const matrix = {};
+  const products = {};
+  ALL_CATEGORIES.forEach(cat => {
+    matrix[cat] = {};
+    products[cat] = {};
+    BRANDS.forEach(brand => {
+      matrix[cat][brand] = 0;
+      products[cat][brand] = [];
+    });
+  });
+
+  DATA.forEach(row => {
+    const [brand, , productName, cat, qty] = row;
+    if (matrix[cat] && matrix[cat][brand] !== undefined) {
+      matrix[cat][brand] += qty;
+      products[cat][brand].push({ name: productName, qty });
+    }
+  });
+
+  return { matrix, products };
+}
+
+function buildHeatmapData() {
+  return buildHeatmapDataRaw();
+}
+
+// === RENDER PILLS ===
+function renderPills() {
+  const catContainer = document.getElementById('categoryPills');
+  const brandContainer = document.getElementById('brandPills');
+
+  let catHTML = '';
+  CATEGORIES.forEach(cat => {
+    const color = CAT_COLORS[cat];
+    const active = activeCategories.has(cat);
+    catHTML += `<span class="pill category-pill${active ? ' active' : ''}" data-cat="${cat}" style="${active ? `background:${color};border-color:${color};color:#fff;` : ''}"><span class="pill-dot" style="background:${color};"></span>${cat}</span>`;
+  });
+  catContainer.innerHTML = catHTML;
+
+  let brandHTML = '';
+  SORTED_BRANDS.forEach(brand => {
+    const active = activeBrands.has(brand);
+    brandHTML += `<span class="pill brand-pill${active ? ' active' : ''}" data-brand="${brand}">${BRAND_SHORT[brand]}</span>`;
+  });
+  brandContainer.innerHTML = brandHTML;
+
+  // Attach events
+  catContainer.querySelectorAll('.pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      const cat = pill.dataset.cat;
+      if (activeCategories.has(cat)) activeCategories.delete(cat);
+      else activeCategories.add(cat);
+      renderPills();
+      applyFilters();
+    });
+  });
+
+  brandContainer.querySelectorAll('.pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      const brand = pill.dataset.brand;
+      if (activeBrands.has(brand)) activeBrands.delete(brand);
+      else activeBrands.add(brand);
+      renderPills();
+      applyFilters();
+    });
+  });
+}
+
+// === RENDER HEATMAP ===
+function renderHeatmap() {
+  const { matrix, products } = buildHeatmapData();
+  const table = document.getElementById('heatmapTable');
+
+  // Determine visible brands and categories based on active filters
+  const visibleBrands = activeBrands.size > 0 ? SORTED_BRANDS.filter(b => activeBrands.has(b)) : SORTED_BRANDS;
+  const sortedCats = getSortedCategories();
+  const visibleCats = activeCategories.size > 0 ? sortedCats.filter(c => activeCategories.has(c)) : sortedCats;
+
+  // Center the table when filtered
+  const wrapper = document.querySelector('.heatmap-wrapper');
+  const tableEl = document.getElementById('heatmapTable');
+  if (activeBrands.size > 0 && activeBrands.size < SORTED_BRANDS.length) {
+    tableEl.style.margin = '0 auto';
+    tableEl.style.width = 'auto';
+  } else {
+    tableEl.style.margin = '';
+    tableEl.style.width = '100%';
+  }
+
+  // Compute cell width based on how many brand columns are visible (fill the page)
+  const colCount = visibleBrands.length;
+  const cellWidth = colCount <= 3 ? 180 : colCount <= 5 ? 120 : colCount <= 7 ? 90 : 68;
+
+  // Compute COLUMN maxes for intensity (within visible brands)
+  const colMax = {};
+  visibleBrands.forEach(brand => {
+    let max = 0;
+    visibleCats.forEach(cat => {
+      if (matrix[cat][brand] > max) max = matrix[cat][brand];
+    });
+    colMax[brand] = max;
+  });
+
+  // Column totals (within visible categories)
+  const colTotals = {};
+  visibleBrands.forEach(brand => {
+    colTotals[brand] = 0;
+    visibleCats.forEach(cat => { colTotals[brand] += matrix[cat][brand]; });
+  });
+
+  // Compute coverage per brand (across ALL categories, not just filtered)
+  const brandCoverage = {};
+  visibleBrands.forEach(brand => {
+    brandCoverage[brand] = ALL_CATEGORIES.filter(cat => matrix[cat][brand] > 0).length;
+  });
+
+  // Header
+  let html = '<thead><tr><th></th>';
+  visibleBrands.forEach((brand, idx) => {
+    const cov = brandCoverage[brand];
+    html += `<th data-brand-idx="${idx}" style="min-width:${cellWidth}px;width:${cellWidth}px;"><span class="col-label">${BRAND_SHORT[brand]}<br><span style="font-size:9px;font-weight:400;opacity:0.7;">${cov}/15</span></span></th>`;
+  });
+  html += '<th class="total-col-header"><span class="col-label">TOTAL</span></th>';
+  html += '</tr></thead><tbody>';
+
+  // Category rows (sorted by coverage)
+  visibleCats.forEach(cat => {
+    const color = CAT_COLORS[cat];
+    const brandCount = BRANDS.filter(b => matrix[cat][b] > 0).length;
+    html += `<tr class="cat-row" data-cat="${cat}">`;
+    html += `<td><span class="cat-dot" style="background:${color};"></span>${cat} <span style="font-size:10px;opacity:0.5;font-weight:400;">(${brandCount})</span></td>`;
+    visibleBrands.forEach(brand => {
+      const val = matrix[cat][brand];
+      const prodList = products[cat][brand];
+      const prodCount = prodList.length;
+      if (val > 0) {
+        const logVal = Math.log(val + 1);
+        const logMax = Math.log(colMax[brand] + 1);
+        const intensity = logMax > 0 ? logVal / logMax : 0;
+        const bgColor = getIntensityColor(color, intensity);
+        const lightText = isLightColor(color, intensity);
+        html += `<td class="heatmap-cell" style="width:${cellWidth}px;"><div class="cell-inner filled clickable-cell${lightText ? ' light-text' : ''}" style="background:${bgColor};height:${colCount<=3?'64px':'44px'};font-size:${colCount<=3?'15px':'12px'};cursor:pointer;" data-brand="${brand}" data-cat="${cat}" data-val="${val}" data-products="${prodCount}">${formatNum(val)}<span class="cell-prod-count">${prodCount}p</span></div></td>`;
+      } else {
+        html += `<td class="heatmap-cell" style="width:${cellWidth}px;"><div class="cell-inner empty" style="height:${colCount<=3?'64px':'44px'};" data-brand="${brand}" data-cat="${cat}" data-val="0" data-products="0">&mdash;</div></td>`;
+      }
+    });
+    // Row total
+    const rowTotal = visibleBrands.reduce((sum, brand) => sum + matrix[cat][brand], 0);
+    html += `<td class="row-total-cell"><span class="total-badge">${formatNum(rowTotal)}</span></td>`;
+    html += '</tr>';
+
+
+    // Sub-rows (products within this category)
+    const allProds = {};
+    visibleBrands.forEach(brand => {
+      products[cat][brand].forEach(p => {
+        if (!allProds[p.name]) allProds[p.name] = {};
+        if (!allProds[p.name][brand]) allProds[p.name][brand] = 0;
+        allProds[p.name][brand] += p.qty;
+      });
+    });
+
+    Object.keys(allProds).forEach(prodName => {
+      html += `<tr class="sub-row" data-parent-cat="${cat}">`;
+      html += `<td>${prodName}</td>`;
+      let subRowTotal = 0;
+      visibleBrands.forEach(brand => {
+        const pVal = allProds[prodName][brand] || 0;
+        subRowTotal += pVal;
+        if (pVal > 0) {
+          const logVal = Math.log(pVal + 1);
+          const logMax = Math.log(colMax[brand] + 1);
+          const intensity = logMax > 0 ? logVal / logMax : 0;
+          const bgColor = getIntensityColor(color, intensity);
+          const lightText = isLightColor(color, intensity);
+          html += `<td class="heatmap-cell" style="width:${cellWidth}px;"><div class="cell-inner filled${lightText ? ' light-text' : ''}" style="background:${bgColor};">${formatNum(pVal)}</div></td>`;
+        } else {
+          html += `<td class="heatmap-cell" style="width:${cellWidth}px;"><div class="cell-inner empty">&mdash;</div></td>`;
+        }
+      });
+      html += `<td class="row-total-cell"><span class="total-badge" style="background:#546e7a;font-size:10px;padding:3px 8px;">${formatNum(subRowTotal)}</span></td>`;
+      html += '</tr>';
+    });
+  });
+
+  // Total row
+  const grandTotal = visibleBrands.reduce((sum, brand) => sum + colTotals[brand], 0);
+  html += '<tr class="total-row"><td>TOTAL</td>';
+  visibleBrands.forEach(brand => {
+    html += `<td class="heatmap-cell" style="width:${cellWidth}px;"><div class="cell-inner" style="height:${colCount<=3?'64px':'44px'};font-size:${colCount<=3?'14px':'11px'};">${formatNum(colTotals[brand])}</div></td>`;
+  });
+  html += `<td class="row-total-cell"><span class="total-badge">${formatNum(grandTotal)}</span></td>`;
+  html += '</tr>';
+
+  html += '</tbody>';
+  table.innerHTML = html;
+
+  // Attach row expand
+  table.querySelectorAll('.cat-row td:first-child').forEach(td => {
+    td.addEventListener('click', () => {
+      const cat = td.parentElement.dataset.cat;
+      if (expandedRows.has(cat)) {
+        expandedRows.delete(cat);
+      } else {
+        expandedRows.add(cat);
+      }
+      applyExpand();
+    });
+  });
+
+
+  // Click to show detail card directly under the clicked cell's column
+  table.querySelectorAll('.clickable-cell').forEach(cell => {
+    cell.addEventListener('click', (e) => {
+      e.stopPropagation();
+
+      const brand = cell.dataset.brand;
+      const cat = cell.dataset.cat;
+      const key = brand + '|' + cat;
+
+      // If this exact card is already open, close it (toggle)
+      const existingCard = table.querySelector(`.detail-card[data-key="${CSS.escape(key)}"]`);
+      if (existingCard) {
+        cell.classList.remove('cell-active-source');
+        const parentFlex = existingCard.closest('.detail-row-flex');
+        existingCard.remove();
+        if (parentFlex && !parentFlex.children.length) parentFlex.closest('.detail-insert-row').remove();
+        return;
+      }
+
+      const prods = (products[cat] && products[cat][brand]) || [];
+      if (!prods.length) return;
+
+      // Highlight the source cell
+      cell.classList.add('cell-active-source');
+
+      const catRow = table.querySelector(`tr.cat-row[data-cat="${cat}"]`);
+      const totalCols = catRow.children.length;
+
+      // Get the column index to determine left vs right half
+      const parentTd = cell.closest('td');
+      const parentTr = cell.closest('tr');
+      const colIndex = Array.from(parentTr.children).indexOf(parentTd);
+      const midpoint = Math.ceil(totalCols / 2);
+      const isRight = colIndex >= midpoint;
+
+      // Distinct color per brand
+      const brandIdx = visibleBrands.indexOf(brand);
+      const BRAND_COLORS = ['#0176d3','#e91e63','#00bfa5','#7c4dff','#ff6d00','#1b5e20','#2962ff','#611f69','#d32f2f','#00695c'];
+      const brandColor = BRAND_COLORS[brandIdx % BRAND_COLORS.length];
+
+      // Count how many active (non-gray) cells are on each side for this category
+      const leftActive = visibleBrands.slice(0, Math.floor(visibleBrands.length / 2)).filter(b => matrix[cat][b] > 0).length;
+      const rightActive = visibleBrands.slice(Math.floor(visibleBrands.length / 2)).filter(b => matrix[cat][b] > 0).length;
+      const totalActive = leftActive + rightActive;
+
+      // Determine split: if one side has very few, give more space to the other
+      let leftPct = 50;
+      if (totalActive > 0) {
+        if (rightActive === 0) leftPct = 100;
+        else if (leftActive === 0) leftPct = 0;
+        else if (rightActive <= 1 && leftActive > 2) leftPct = 70;
+        else if (leftActive <= 1 && rightActive > 2) leftPct = 30;
+      }
+
+      // Find or create the detail-insert-row for this category
+      let detailRow = table.querySelector(`.detail-insert-row[data-cat="${cat}"]`);
+      if (!detailRow) {
+        detailRow = document.createElement('tr');
+        detailRow.className = 'detail-insert-row';
+        detailRow.dataset.cat = cat;
+        if (leftPct === 100) {
+          detailRow.innerHTML = `<td colspan="${totalCols}"><div class="detail-row-container"><svg class="connector-overlay"></svg><div class="detail-row-left" style="width:100%;border-right:none;"></div><div class="detail-row-right" style="width:0;display:none;"></div></div></td>`;
+        } else if (leftPct === 0) {
+          detailRow.innerHTML = `<td colspan="${totalCols}"><div class="detail-row-container"><svg class="connector-overlay"></svg><div class="detail-row-left" style="width:0;display:none;"></div><div class="detail-row-right" style="width:100%;"></div></div></td>`;
+        } else {
+          detailRow.innerHTML = `<td colspan="${totalCols}"><div class="detail-row-container"><svg class="connector-overlay"></svg><div class="detail-row-left" style="width:${leftPct}%;"></div><div class="detail-row-right" style="width:${100-leftPct}%;"></div></div></td>`;
+        }
+        catRow.after(detailRow);
+      }
+
+      const leftContainer = detailRow.querySelector('.detail-row-left');
+      const rightContainer = detailRow.querySelector('.detail-row-right');
+      const targetContainer = isRight ? rightContainer : leftContainer;
+      // If target is hidden, use the other side
+      const finalContainer = (targetContainer.style.display === 'none') ? (isRight ? leftContainer : rightContainer) : targetContainer;
+
+      // Build list
+      let listHtml = '';
+      [...prods].sort((a,b) => b.qty - a.qty).forEach(p => {
+        listHtml += `<li><span class="detail-item-name">${p.name}</span><span class="detail-item-qty">${p.qty.toLocaleString()}</span></li>`;
+      });
+
+      // Create card with distinct brand color
+      const card = document.createElement('div');
+      card.className = 'detail-card';
+      card.dataset.key = key;
+      card.dataset.colIndex = colIndex;
+      card.style.borderColor = brandColor;
+      card.style.borderTopColor = brandColor;
+      card.innerHTML = `
+        <div class="detail-card-header">
+          <h4>${cat}</h4>
+          <span class="detail-card-brand" style="background:${brandColor};">${BRAND_SHORT[brand]}</span>
+          <button class="detail-card-close">&times;</button>
+        </div>
+        <ul class="detail-list">${listHtml}</ul>
+      `;
+
+      // Also color the source cell outline to match
+      cell.style.outlineColor = brandColor;
+
+      // Close button
+      card.querySelector('.detail-card-close').addEventListener('click', () => {
+        cell.classList.remove('cell-active-source');
+        cell.style.outlineColor = '';
+        card.remove();
+        if (!leftContainer.children.length && !rightContainer.children.length) {
+          detailRow.remove();
+        } else {
+          setTimeout(() => drawCurves(cat), 20);
+        }
+      });
+
+      // Insert in column order within the target half
+      const existingCards = [...finalContainer.querySelectorAll('.detail-card')];
+      const insertBefore = existingCards.find(c => parseInt(c.dataset.colIndex) > colIndex);
+      if (insertBefore) {
+        finalContainer.insertBefore(card, insertBefore);
+      } else {
+        finalContainer.appendChild(card);
+      }
+
+      // Draw curved connector lines
+      setTimeout(() => drawCurves(cat), 20);
+    });
+  });
+
+
+  // Draw smooth bezier curves connecting source cells to their cards
+  function drawCurves(cat) {
+    const detailRow = table.querySelector(`.detail-insert-row[data-cat="${cat}"]`);
+    if (!detailRow) return;
+    const container = detailRow.querySelector('.detail-row-container');
+    const svg = container.querySelector('svg.connector-overlay');
+    if (!svg) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const cards = container.querySelectorAll('.detail-card');
+
+    let paths = '';
+    cards.forEach(card => {
+      const key = card.dataset.key;
+      const parts = key.split('|');
+      const cardBrand = parts[0];
+      const cardCat = parts.slice(1).join('|');
+
+      // Find source cell
+      const sourceCell = table.querySelector(`.clickable-cell.cell-active-source[data-brand="${cardBrand}"][data-cat="${cardCat}"]`);
+      if (!sourceCell) return;
+
+      const sourceRect = sourceCell.getBoundingClientRect();
+      const cardRect = card.getBoundingClientRect();
+
+      // Source point: bottom-center of the source cell
+      const sx = sourceRect.left + sourceRect.width / 2 - containerRect.left;
+      const sy = sourceRect.bottom - containerRect.top;
+
+      // Card point: top-center of the card
+      const cx = cardRect.left + cardRect.width / 2 - containerRect.left;
+      const cy = cardRect.top - containerRect.top;
+
+      // Smooth bezier: drops down from source, curves to card
+      const midY = sy + (cy - sy) * 0.4;
+      const color = card.style.borderColor || '#0176d3';
+
+      paths += `<path d="M${sx},${sy} C${sx},${midY} ${cx},${midY} ${cx},${cy}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>`;
+      paths += `<circle cx="${sx}" cy="${sy}" r="4" fill="${color}" opacity="0.9"/>`;
+      paths += `<circle cx="${cx}" cy="${cy}" r="3.5" fill="${color}" opacity="0.9"/>`;
+    });
+
+    svg.innerHTML = paths;
+  }
+
+  // Escape key closes all panels
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      table.querySelectorAll('.detail-insert-row').forEach(r => r.remove());
+      table.querySelectorAll('.cell-active-source').forEach(c => c.classList.remove('cell-active-source'));
+    }
+  });
+
+  // White space mode
+  if (wsMode) {
+    table.querySelectorAll('.cell-inner.empty').forEach(cell => {
+      cell.classList.add('ws-highlight');
+    });
+  }
+}
+
+function applyExpand() {
+  document.querySelectorAll('.sub-row').forEach(row => {
+    const parentCat = row.dataset.parentCat;
+    if (expandedRows.has(parentCat)) {
+      row.classList.add('visible');
+    } else {
+      row.classList.remove('visible');
+    }
+  });
+}
+
+// === TOOLTIPS ===
+function setupTooltips() {
+  const tooltip = document.getElementById('tooltip');
+  const cells = document.querySelectorAll('.cat-row .cell-inner');
+
+  cells.forEach(cell => {
+    cell.addEventListener('mouseenter', (e) => {
+      const brand = cell.dataset.brand;
+      const cat = cell.dataset.cat;
+      const val = parseInt(cell.dataset.val);
+      const prodCount = parseInt(cell.dataset.products);
+      const shortBrand = BRAND_SHORT[brand] || brand;
+
+      let content = `<span class="tooltip-brand">${shortBrand}</span><br>`;
+      content += `<span class="tooltip-cat">${cat}</span><br>`;
+      if (val > 0) {
+        content += `<span class="tooltip-count">${prodCount} product${prodCount !== 1 ? 's' : ''} &middot; ${val.toLocaleString()} total qty</span>`;
+      } else {
+        content += `<span class="tooltip-count">No products deployed</span>`;
+      }
+      tooltip.innerHTML = content;
+      tooltip.classList.add('visible');
+    });
+
+    cell.addEventListener('mousemove', (e) => {
+      tooltip.style.left = (e.clientX + 12) + 'px';
+      tooltip.style.top = (e.clientY - 10) + 'px';
+    });
+
+    cell.addEventListener('mouseleave', () => {
+      tooltip.classList.remove('visible');
+    });
+  });
+}
+
+// === FILTERS ===
+function applyFilters() {
+  renderHeatmap();
+}
+
+
+// === INIT ===
+document.addEventListener('DOMContentLoaded', () => {
+  CATEGORIES = getSortedCategories();
+  SORTED_BRANDS = getSortedBrands();
+  renderPills();
+  renderHeatmap();
+
+  // White space toggle
+  document.getElementById('wsToggle').addEventListener('click', () => {
+    wsMode = !wsMode;
+    const el = document.getElementById('wsToggle');
+    el.classList.toggle('active', wsMode);
+    applyFilters();
+  });
+
+  // Clear all
+  document.getElementById('clearAll').addEventListener('click', () => {
+    activeCategories.clear();
+    activeBrands.clear();
+    wsMode = false;
+    document.getElementById('wsToggle').classList.remove('active');
+    renderPills();
+    applyFilters();
+  });
+});
+</script>
+</body>
+</html>
