@@ -174,6 +174,37 @@ body {
   border-color: #f59e0b;
   color: #92400e;
 }
+.util-slider-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.util-slider {
+  width: 100px;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #e2e5ea;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+.util-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #0176d3;
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.util-slider-val {
+  font-size: 11px;
+  font-weight: 700;
+  color: #0176d3;
+  min-width: 50px;
+}
 
 /* === HEATMAP === */
 .heatmap-section {
@@ -417,6 +448,37 @@ body {
   padding: 0 0 0 8px;
 }
 .detail-card-close:hover { color: #dc2626; }
+.detail-item-util {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+.mini-eu-label {
+  font-size: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: #9ca3af;
+}
+.mini-eu-bar {
+  width: 36px;
+  height: 5px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+  display: inline-block;
+}
+.mini-eu-fill {
+  height: 100%;
+  border-radius: 3px;
+  display: block;
+}
+.mini-eu-pct {
+  font-size: 9px;
+  font-weight: 700;
+  min-width: 24px;
+}
 
 /* Highlight the source cell when detail is open */
 .cell-active-source {
@@ -595,6 +657,11 @@ body {
   </div>
   <div class="filter-band filter-band-actions">
     <span class="pill pill-whitespace" id="wsToggle">White Space Only</span>
+    <span class="filter-section-label" style="margin-left:16px;">Utilization</span>
+    <span class="util-slider-group">
+      <input type="range" class="util-slider" id="utilSlider" min="0" max="100" value="100">
+      <span class="util-slider-val" id="utilSliderVal">≤ 100%</span>
+    </span>
     <span class="pill pill-clear" id="clearAll">Clear All</span>
   </div>
 </div>
@@ -729,6 +796,142 @@ const DATA = [
   ['Steelcase Proxy Org','US-bdd08936-c1e1-42a2-ac64-2ee91bd0ac76','MuleSoft - Automation - Composer for Salesforce - LP','MuleSoft',1],
 ];
 
+// === UTILIZATION DATA ===
+const UTIL_BY_BRAND = {
+  'Fireside Hearth & Home': {
+    'Cross Cloud - CRM': {eu:76,totalP:96,totalU:73,products:[{t:'SFDC',p:96,a:85,u:73}]},
+    'Cross Cloud - Einstein': {eu:0,totalP:480,totalU:0,products:[{t:'EinsteinGPTSalesCallSummariesPsl',p:96,a:0,u:0},{t:'EinsteinGPTSalesEmailsPsl',p:96,a:0,u:0},{t:'EinsteinGPTSalesSummariesPsl',p:96,a:0,u:0},{t:'EinsteinAgentCWUPsl',p:96,a:0,u:0},{t:'EinsteinAgentPsl',p:96,a:0,u:0}]},
+    'Industries': {eu:0,totalP:288,totalU:0,products:[{t:'BRERuntime',p:96,a:0,u:0},{t:'BREDesigner',p:96,a:0,u:0},{t:'IndustriesServiceExcellencePsl',p:96,a:0,u:0}]},
+    'Marketing': {eu:0,totalP:96,totalU:0,products:[{t:'AnalyticsViewOnlyEmbeddedAppPsl',p:96,a:0,u:0}]},
+    'Sales': {eu:3,totalP:60,totalU:2,products:[{t:'Maps_Core',p:60,a:4,u:2}]},
+    'Salesforce Platform': {eu:0,totalP:17638507,totalU:41271,products:[{t:'Provisioned30DayApiRequests',p:17400000,a:null,u:38015},{t:'PID_Identity_User',p:192,a:0,u:0},{t:'Developer Pro Sandbox',p:5,a:null,u:3},{t:'Developer Sandbox',p:100,a:null,u:3},{t:'Full Sandbox',p:1,a:null,u:1},{t:'Partial Sandbox',p:1,a:null,u:0},{t:'Data Storage',p:21760,a:null,u:330},{t:'File Storage',p:216448,a:null,u:2919}]},
+    'Service': {eu:0,totalP:2496,totalU:0,products:[{t:'Einstein Bot Engaged Sessions',p:2400,a:null,u:0},{t:'EmbeddedServiceMessagingUserPsl',p:96,a:0,u:0}]},
+  },
+  'Heatilator,Heat-N-Glo,Aladdin Hearth': {
+    'AI and Data': {eu:0,totalP:4,totalU:0,products:[{t:'UnmeteredUserBasedAIPsl',p:3,a:0,u:0},{t:'GenieDataPlatformStarterPsl',p:1,a:0,u:0}]},
+    'Analytics': {eu:39,totalP:207,totalU:80,products:[{t:'Cloud - Creator',p:42,a:36,u:25},{t:'Cloud - Explorer',p:95,a:73,u:40},{t:'Cloud - Viewer',p:70,a:21,u:15}]},
+    'Cross Cloud - CRM': {eu:80,totalP:294,totalU:235,products:[{t:'SFDC',p:294,a:284,u:235}]},
+    'Cross Cloud - Einstein': {eu:0,totalP:201530,totalU:0,products:[{t:'EinsteinGPTPromptTemplatesPsl',p:100003,a:0,u:0},{t:'GenerativeAISummarizationPsl',p:100003,a:0,u:0},{t:'NLPServicePsl',p:3,a:0,u:0},{t:'EinsteinCopilotReviewMyDayPsl',p:3,a:0,u:0},{t:'EinsteinGPTCallExplorerPsl',p:3,a:0,u:0},{t:'EinsteinGPTCreateClosePlanPsl',p:3,a:0,u:0},{t:'EinsteinGPTGetProductPricingPsl',p:3,a:0,u:0},{t:'EinsteinGPTMeetingFollowUpPsl',p:3,a:0,u:0},{t:'EinsteinGPTSalesCallSummariesPsl',p:297,a:0,u:0},{t:'EinsteinGPTSalesEmailsPsl',p:297,a:0,u:0},{t:'EinsteinGPTSalesMiningPsl',p:3,a:0,u:0},{t:'EinsteinGPTSalesPartnerPsl',p:3,a:0,u:0},{t:'EinsteinGPTSalesSummariesPsl',p:297,a:0,u:0},{t:'EinsteinGPTSendMeetingRequestPsl',p:3,a:0,u:0},{t:'EinsteinSalesGenerativeInsightsPsl',p:3,a:0,u:0},{t:'EinsteinSalesRepFeedbackPsl',p:3,a:0,u:0},{t:'GPTRecordResearchPsl',p:3,a:0,u:0},{t:'SalesActionFindPastCollaboratorsPsl',p:3,a:0,u:0},{t:'SalesActionReviewBuyingCommitteePsl',p:3,a:0,u:0},{t:'SalesCloudEinsteinPsl',p:3,a:0,u:0},{t:'EinsteinAgentCWUPsl',p:294,a:0,u:0},{t:'EinsteinAgentPsl',p:294,a:0,u:0}]},
+    'Marketing': {eu:0,totalP:4294,totalU:0,products:[{t:'AnalyticsViewOnlyEmbeddedAppPsl',p:294,a:0,u:0},{t:'E360MonthlyEmailSendLimit',p:2000,a:null,u:0},{t:'E360MonthlyEmailSendsNew',p:2000,a:null,u:0}]},
+    'Sales': {eu:0,totalP:1213,totalU:0,products:[{t:'Max External Apps UniqueLogins',p:1212,a:null,u:0},{t:'ProductDiscoveryUserPsl',p:1,a:0,u:0}]},
+    'Salesforce Platform': {eu:5,totalP:67380854,totalU:3543618,products:[{t:'Provisioned30DayApiRequests',p:47100000,a:null,u:1755353},{t:'PID_Identity_User',p:588,a:0,u:0},{t:'Developer Pro Sandbox',p:5,a:null,u:4},{t:'Developer Sandbox',p:100,a:null,u:8},{t:'Full Sandbox',p:1,a:null,u:1},{t:'Partial Sandbox',p:1,a:null,u:1},{t:'Package',p:19,a:null,u:5},{t:'Data Storage',p:98420,a:null,u:66402},{t:'File Storage',p:20181720,a:null,u:1721844}]},
+    'Service': {eu:23,totalP:17199,totalU:4013,products:[{t:'Einstein Bot Engaged Sessions',p:7350,a:null,u:0},{t:'EmbeddedServiceMessagingUserPsl',p:295,a:0,u:0},{t:'ServiceCloudVoiceExternalTelephonyPsl',p:1,a:0,u:0},{t:'Customer Community Login',p:12,a:null,u:0},{t:'Customer Community Member',p:9541,a:9463,u:4013}]},
+  },
+  'HNI - Workplace Furnishings': {
+    'AI and Data': {eu:2,totalP:66,totalU:1,products:[{t:'UnmeteredUserBasedAIPsl',p:65,a:0,u:0},{t:'GenieDataPlatformStarterPsl',p:1,a:1,u:1}]},
+    'Analytics': {eu:0,totalP:181,totalU:0,products:[{t:'InsightsCustomerExperienceAnalyticsPsl',p:15,a:0,u:0},{t:'EinsteinAnalyticsPlusPsl',p:80,a:0,u:0},{t:'CLAAnalyticsBase5Psl',p:65,a:0,u:0},{t:'LoyaltyAnalyticsPlusPsl',p:15,a:0,u:0},{t:'Server - Creator',p:6,a:0,u:null}]},
+    'Cross Cloud - CRM': {eu:89,totalP:858,totalU:760,products:[{t:'SFDC',p:858,a:848,u:760}]},
+    'Cross Cloud - Einstein': {eu:0,totalP:205365,totalU:33,products:[{t:'EinsteinGPTPromptTemplatesPsl',p:100165,a:33,u:33},{t:'GenerativeAISummarizationPsl',p:100065,a:0,u:0},{t:'NLPServicePsl',p:65,a:0,u:0},{t:'EinsteinGPTSalesCallSummariesPsl',p:858,a:0,u:0},{t:'EinsteinGPTSalesEmailsPsl',p:858,a:0,u:0},{t:'EinsteinGPTSalesSummariesPsl',p:858,a:0,u:0},{t:'EinsteinARForConversationsPsl',p:65,a:0,u:0},{t:'EinsteinGPTSearchAnswersPsl',p:65,a:0,u:0},{t:'EinsteinGPTServiceEmailAssistantPsl',p:65,a:0,u:0},{t:'EinsteinGPTServiceRepliesForEmailPsl',p:65,a:0,u:0},{t:'EinsteinGPTServiceRepliesPsl',p:65,a:0,u:0},{t:'EinsteinGPTServiceSummarizationPsl',p:65,a:0,u:0},{t:'EinsteinKnowledgeCreationPsl',p:65,a:0,u:0},{t:'EinsteinSearchAnswersPsl',p:65,a:0,u:0},{t:'EinsteinAgentCWUPsl',p:923,a:0,u:0},{t:'EinsteinAgentPsl',p:923,a:0,u:0},{t:'EinsteinReplyRecommendationsPsl',p:65,a:0,u:0},{t:'NextBestActionRecUnlimitedPSL',p:65,a:0,u:0}]},
+    'Industries': {eu:0,totalP:284035,totalU:0,products:[{t:'BRERuntime',p:65,a:0,u:0},{t:'BREDesigner',p:65,a:0,u:0},{t:'IndustriesServiceExcellencePsl',p:65,a:0,u:0},{t:'RebateManagementExpCloudPsl',p:283840,a:0,u:0}]},
+    'Marketing': {eu:9,totalP:161444889,totalU:14708189,products:[{t:'AccountEngagementPsl',p:1000,a:9,u:8},{t:'B2BMarketingAnalytics',p:11,a:1,u:1},{t:'Pardot Contacts',p:150000,a:null,u:40427},{t:'AnalyticsViewOnlyEmbeddedAppPsl',p:878,a:0,u:0},{t:'Contacts',p:1273000,a:null,u:656200},{t:'Super Messages - excluding SMS/MMS',p:160000000,a:null,u:14011553},{t:'E360MonthlyEmailSendLimit',p:2000,a:null,u:0},{t:'E360MonthlyEmailSendsNew',p:2000,a:null,u:0},{t:'SMS/MMS Mobile Messages',p:16000,a:null,u:0}]},
+    'Sales': {eu:74,totalP:250622,totalU:184704,products:[{t:'Partner Community Login',p:168000,a:null,u:182782},{t:'Partner Community Member',p:3840,a:2874,u:1922},{t:'Max External Apps UniqueLogins',p:78780,a:null,u:0},{t:'HighVelocitySalesPsl',p:1,a:0,u:0},{t:'InsightsInboxAdminAnalyticsHVSPsl',p:1,a:0,u:0}]},
+    'Salesforce Platform': {eu:2,totalP:491946970,totalU:8575200,products:[{t:'EmpHvPeMonthDeliveryLimit',p:50250000,a:null,u:20},{t:'Provisioned30DayApiRequests',p:414900000,a:null,u:3817919},{t:'PID_Identity_User',p:1876,a:1,u:0},{t:'Developer Pro Sandbox',p:5,a:null,u:5},{t:'Developer Sandbox',p:106,a:null,u:24},{t:'Full Sandbox',p:1,a:null,u:1},{t:'Partial Sandbox',p:1,a:null,u:1},{t:'Package',p:37,a:null,u:16},{t:'Data Storage',p:821400,a:null,u:426592},{t:'File Storage',p:25973544,a:null,u:4330622}]},
+    'Service': {eu:1,totalP:55258,totalU:309,products:[{t:'Einstein Bot Engaged Sessions',p:21450,a:null,u:203},{t:'EmbeddedServiceMessagingUserPsl',p:923,a:46,u:45},{t:'Inbound SMS Conversations',p:1625,a:null,u:0},{t:'LiveMessageUserPsl',p:65,a:0,u:0},{t:'Outbound SMS Messages',p:1000,a:null,u:0},{t:'ServiceCloudVoiceExternalTelephonyPsl',p:65,a:62,u:61},{t:'ServiceIntelligencePsl',p:65,a:0,u:0},{t:'Customer Community Login',p:30000,a:null,u:0},{t:'InsightsServiceAnalyticsPsl',p:65,a:0,u:0}]},
+  },
+  'HNI India': {
+    'Cross Cloud - CRM': {eu:2,totalP:41,totalU:1,products:[{t:'SFDC',p:41,a:4,u:1}]},
+    'Cross Cloud - Einstein': {eu:0,totalP:205,totalU:0,products:[{t:'EinsteinGPTSalesCallSummariesPsl',p:41,a:0,u:0},{t:'EinsteinGPTSalesEmailsPsl',p:41,a:0,u:0},{t:'EinsteinGPTSalesSummariesPsl',p:41,a:0,u:0},{t:'EinsteinAgentCWUPsl',p:41,a:1,u:0},{t:'EinsteinAgentPsl',p:41,a:2,u:0}]},
+    'Marketing': {eu:0,totalP:41,totalU:0,products:[{t:'AnalyticsViewOnlyEmbeddedAppPsl',p:41,a:0,u:0}]},
+    'Salesforce Platform': {eu:0,totalP:9263657,totalU:697,products:[{t:'Provisioned30DayApiRequests',p:9150000,a:null,u:1},{t:'PID_Identity_User',p:82,a:0,u:0},{t:'Developer Pro Sandbox',p:5,a:null,u:1},{t:'Developer Sandbox',p:100,a:null,u:0},{t:'Full Sandbox',p:1,a:null,u:1},{t:'Partial Sandbox',p:1,a:null,u:1},{t:'Data Storage',p:15160,a:null,u:636},{t:'File Storage',p:98308,a:null,u:57}]},
+    'Service': {eu:0,totalP:1066,totalU:0,products:[{t:'Einstein Bot Engaged Sessions',p:1025,a:null,u:0},{t:'EmbeddedServiceMessagingUserPsl',p:41,a:0,u:0}]},
+  },
+  'Kimball Hospitality Furniture Inc': {
+    'Cross Cloud - CRM': {eu:92,totalP:85,totalU:78,products:[{t:'SFDC',p:85,a:85,u:78}]},
+    'Cross Cloud - Einstein': {eu:0,totalP:425,totalU:0,products:[{t:'EinsteinGPTSalesCallSummariesPsl',p:85,a:0,u:0},{t:'EinsteinGPTSalesEmailsPsl',p:85,a:0,u:0},{t:'EinsteinGPTSalesSummariesPsl',p:85,a:0,u:0},{t:'EinsteinAgentCWUPsl',p:85,a:0,u:0},{t:'EinsteinAgentPsl',p:85,a:0,u:0}]},
+    'Industries': {eu:0,totalP:255,totalU:0,products:[{t:'BRERuntime',p:85,a:0,u:0},{t:'BREDesigner',p:85,a:0,u:0},{t:'IndustriesServiceExcellencePsl',p:85,a:0,u:0}]},
+    'Marketing': {eu:0,totalP:85,totalU:0,products:[{t:'AnalyticsViewOnlyEmbeddedAppPsl',p:85,a:0,u:0}]},
+    'Salesforce Platform': {eu:13,totalP:15963556,totalU:2143926,products:[{t:'Provisioned30DayApiRequests',p:15750000,a:null,u:2080178},{t:'PID_Identity_User',p:170,a:0,u:0},{t:'Developer Pro Sandbox',p:5,a:null,u:0},{t:'Developer Sandbox',p:100,a:null,u:0},{t:'Full Sandbox',p:1,a:null,u:1},{t:'Partial Sandbox',p:1,a:null,u:1},{t:'Package',p:19,a:null,u:5},{t:'Data Storage',p:20440,a:null,u:2030},{t:'File Storage',p:192820,a:null,u:61711}]},
+    'Service': {eu:0,totalP:2210,totalU:0,products:[{t:'Einstein Bot Engaged Sessions',p:2125,a:null,u:0},{t:'EmbeddedServiceMessagingUserPsl',p:85,a:0,u:0}]},
+  },
+  'Kimball International Global Org': {
+    'AI and Data': {eu:0,totalP:51,totalU:0,products:[{t:'UnmeteredUserBasedAIPsl',p:50,a:0,u:0},{t:'GenieDataPlatformStarterPsl',p:1,a:0,u:0}]},
+    'Commerce': {eu:7,totalP:22000000,totalU:1649578,products:[{t:'Commerce Cloud - Digital - GMV-USD',p:6000000,a:null,u:0},{t:'On Demand Sandbox Credits',p:16000000,a:null,u:1649578}]},
+    'Cross Cloud - CRM': {eu:94,totalP:380,totalU:357,products:[{t:'SFDC',p:380,a:380,u:357}]},
+    'Cross Cloud - Einstein': {eu:0,totalP:202700,totalU:73,products:[{t:'EinsteinGPTPromptTemplatesPsl',p:100050,a:33,u:30},{t:'GenerativeAISummarizationPsl',p:100050,a:0,u:0},{t:'NLPServicePsl',p:50,a:0,u:0},{t:'EinsteinCopilotReviewMyDayPsl',p:10,a:0,u:0},{t:'EinsteinGPTCallExplorerPsl',p:10,a:0,u:0},{t:'EinsteinGPTCreateClosePlanPsl',p:10,a:0,u:0},{t:'EinsteinGPTGetProductPricingPsl',p:10,a:0,u:0},{t:'EinsteinGPTMeetingFollowUpPsl',p:10,a:0,u:0},{t:'EinsteinGPTSalesCallSummariesPsl',p:390,a:0,u:0},{t:'EinsteinGPTSalesEmailsPsl',p:390,a:2,u:2},{t:'EinsteinGPTSalesMiningPsl',p:10,a:0,u:0},{t:'EinsteinGPTSalesPartnerPsl',p:10,a:0,u:0},{t:'EinsteinGPTSalesSummariesPsl',p:390,a:0,u:0},{t:'EinsteinGPTSendMeetingRequestPsl',p:10,a:0,u:0},{t:'EinsteinSalesGenerativeInsightsPsl',p:10,a:0,u:0},{t:'EinsteinSalesRepFeedbackPsl',p:10,a:0,u:0},{t:'GPTRecordResearchPsl',p:10,a:0,u:0},{t:'SalesActionFindPastCollaboratorsPsl',p:10,a:0,u:0},{t:'SalesActionReviewBuyingCommitteePsl',p:10,a:0,u:0},{t:'SalesCloudEinsteinPsl',p:10,a:0,u:0},{t:'EinsteinARForConversationsPsl',p:40,a:0,u:0},{t:'EinsteinGPTSearchAnswersPsl',p:40,a:0,u:0},{t:'EinsteinGPTServiceEmailAssistantPsl',p:40,a:33,u:30},{t:'EinsteinGPTServiceRepliesForEmailPsl',p:40,a:2,u:2},{t:'EinsteinGPTServiceRepliesPsl',p:40,a:2,u:2},{t:'EinsteinGPTServiceSummarizationPsl',p:40,a:7,u:7},{t:'EinsteinKnowledgeCreationPsl',p:40,a:0,u:0},{t:'EinsteinSearchAnswersPsl',p:40,a:0,u:0},{t:'EinsteinAgentCWUPsl',p:420,a:0,u:0},{t:'EinsteinAgentPsl',p:420,a:0,u:0},{t:'EinsteinReplyRecommendationsPsl',p:40,a:0,u:0},{t:'NextBestActionRecUnlimitedPSL',p:40,a:0,u:0}]},
+    'Industries': {eu:0,totalP:1140,totalU:0,products:[{t:'BRERuntime',p:380,a:0,u:0},{t:'BREDesigner',p:380,a:0,u:0},{t:'IndustriesServiceExcellencePsl',p:380,a:0,u:0}]},
+    'Marketing': {eu:3,totalP:4570,totalU:148,products:[{t:'AnalyticsViewOnlyEmbeddedAppPsl',p:420,a:0,u:0},{t:'DistributedMarketingPSL',p:150,a:150,u:148},{t:'E360MonthlyEmailSendLimit',p:2000,a:null,u:0},{t:'E360MonthlyEmailSendsNew',p:2000,a:null,u:0}]},
+    'Sales': {eu:0,totalP:8212,totalU:0,products:[{t:'Max External Apps UniqueLogins',p:1212,a:null,u:0},{t:'ProductDiscoveryUserPsl',p:7000,a:0,u:0}]},
+    'Salesforce Platform': {eu:2,totalP:116067913,totalU:2071729,products:[{t:'EmpHvPeMonthDeliveryLimit',p:12000000,a:null,u:18},{t:'Provisioned30DayApiRequests',p:102000000,a:null,u:894166},{t:'PID_Identity_User',p:760,a:55,u:11},{t:'Developer Pro Sandbox',p:5,a:null,u:0},{t:'Developer Sandbox',p:100,a:null,u:2},{t:'Full Sandbox',p:1,a:null,u:1},{t:'Partial Sandbox',p:1,a:null,u:1},{t:'Package',p:46,a:null,u:17},{t:'Data Storage',p:196040,a:null,u:133541},{t:'File Storage',p:1870960,a:null,u:1043972}]},
+    'Service': {eu:98,totalP:95650,totalU:93293,products:[{t:'Einstein Bot Engaged Sessions',p:9850,a:null,u:466},{t:'EmbeddedServiceMessagingUserPsl',p:395,a:0,u:0},{t:'Inbound SMS Conversations',p:350,a:null,u:16},{t:'LiveMessageUserPsl',p:14,a:12,u:12},{t:'Outbound SMS Messages',p:1000,a:null,u:0},{t:'ServiceCloudVoiceExternalTelephonyPsl',p:1,a:0,u:0},{t:'Customer Community Plus Login',p:84000,a:null,u:92799},{t:'InsightsServiceAnalyticsPsl',p:40,a:0,u:0}]},
+  },
+  'National Office Furniture': {
+    'Marketing': {eu:3,totalP:37624000,totalU:1238294,products:[{t:'Contacts',p:60000,a:null,u:44671},{t:'Email Attachments',p:1000,a:null,u:0},{t:'Super Messages - excluding SMS/MMS',p:37500000,a:null,u:1168327},{t:'SMS/MMS Mobile Messages',p:63000,a:null,u:25296}]},
+  },
+  'Steelcase MAIN': {
+    'AI and Data': {eu:800,totalP:1,totalU:8,products:[{t:'GenieDataPlatformStarterPsl',p:1,a:10,u:8}]},
+    'Analytics': {eu:0,totalP:3105,totalU:0,products:[{t:'Server - Creator',p:280,a:280,u:null},{t:'Server - Explorer',p:250,a:250,u:null},{t:'Server - Viewer',p:2575,a:2575,u:null}]},
+    'Commerce': {eu:94,totalP:4153,totalU:3915,products:[{t:'Active Storefronts',p:3,a:null,u:4},{t:'Orders Placed - Edition',p:4100,a:null,u:3895},{t:'B2BCommerceAdminPsl',p:50,a:17,u:16}]},
+    'Cross Cloud - CRM': {eu:78,totalP:1503,totalU:1173,products:[{t:'SFDC',p:1503,a:1313,u:1173}]},
+    'Cross Cloud - Einstein': {eu:0,totalP:7462,totalU:2,products:[{t:'EinsteinGPTSalesCallSummariesPsl',p:1492,a:0,u:0},{t:'EinsteinGPTSalesEmailsPsl',p:1492,a:0,u:0},{t:'EinsteinGPTSalesSummariesPsl',p:1492,a:0,u:0},{t:'EinsteinAgentCWUPsl',p:1493,a:0,u:0},{t:'EinsteinAgentPsl',p:1493,a:2,u:2}]},
+    'Industries': {eu:0,totalP:4551,totalU:0,products:[{t:'BRERuntime',p:1492,a:0,u:0},{t:'BREDesigner',p:1492,a:0,u:0},{t:'IndustriesServiceExcellencePsl',p:1492,a:0,u:0},{t:'RebateManagementExpCloudPsl',p:75,a:0,u:0}]},
+    'Marketing': {eu:0,totalP:1492,totalU:0,products:[{t:'AnalyticsViewOnlyEmbeddedAppPsl',p:1492,a:0,u:0}]},
+    'Sales': {eu:0,totalP:17425,totalU:39,products:[{t:'Partner Community Member',p:75,a:71,u:39},{t:'ProductDiscoveryUserPsl',p:17350,a:0,u:0}]},
+    'Salesforce Platform': {eu:5,totalP:357637565,totalU:17598447,products:[{t:'CompanyCommunityPsl',p:170,a:12,u:8},{t:'AUL',p:170,a:106,u:25},{t:'EmpHvPeMonthDeliveryLimit',p:1500000,a:null,u:124},{t:'Provisioned30DayApiRequests',p:352020000,a:null,u:15624773},{t:'PID_Identity_User',p:3006,a:0,u:0},{t:'Developer Pro Sandbox',p:5,a:null,u:4},{t:'Developer Sandbox',p:100,a:null,u:20},{t:'Full Sandbox',p:1,a:null,u:1},{t:'Partial Sandbox',p:1,a:null,u:1},{t:'Package',p:41,a:null,u:17},{t:'Data Storage',p:461075,a:null,u:96208},{t:'File Storage',p:3652996,a:null,u:1877266}]},
+    'Service': {eu:23,totalP:190168,totalU:44373,products:[{t:'Einstein Bot Engaged Sessions',p:37325,a:null,u:840},{t:'EmbeddedServiceMessagingUserPsl',p:1493,a:1,u:1},{t:'Customer Community Plus Login',p:144000,a:null,u:40655},{t:'Customer Community Plus Member',p:7350,a:3599,u:2877}]},
+  },
+  'Culina Health': {
+    'Analytics': {eu:0,totalP:1,totalU:0,products:[{t:'Cloud - Creator',p:1,a:1,u:0}]},
+  },
+  'Poppin': {
+    'Cross Cloud - CRM': {eu:96,totalP:25,totalU:24,products:[{t:'SFDC',p:25,a:25,u:24}]},
+    'Cross Cloud - Einstein': {eu:0,totalP:125,totalU:0,products:[{t:'EinsteinGPTSalesCallSummariesPsl',p:25,a:0,u:0},{t:'EinsteinGPTSalesEmailsPsl',p:25,a:0,u:0},{t:'EinsteinGPTSalesSummariesPsl',p:25,a:0,u:0},{t:'EinsteinAgentCWUPsl',p:25,a:0,u:0},{t:'EinsteinAgentPsl',p:25,a:0,u:0}]},
+    'Industries': {eu:0,totalP:75,totalU:0,products:[{t:'BRERuntime',p:25,a:0,u:0},{t:'BREDesigner',p:25,a:0,u:0},{t:'IndustriesServiceExcellencePsl',p:25,a:0,u:0}]},
+    'Marketing': {eu:0,totalP:25,totalU:0,products:[{t:'AnalyticsViewOnlyEmbeddedAppPsl',p:25,a:0,u:0}]},
+    'Salesforce Platform': {eu:5,totalP:6837592,totalU:349496,products:[{t:'Provisioned30DayApiRequests',p:6750000,a:null,u:320945},{t:'PID_Identity_User',p:50,a:0,u:0},{t:'Developer Pro Sandbox',p:5,a:null,u:1},{t:'Developer Sandbox',p:100,a:null,u:0},{t:'Full Sandbox',p:1,a:null,u:1},{t:'Partial Sandbox',p:1,a:null,u:1},{t:'Package',p:15,a:null,u:5},{t:'Data Storage',p:23480,a:null,u:11061},{t:'File Storage',p:63940,a:null,u:17482}]},
+    'Service': {eu:0,totalP:650,totalU:0,products:[{t:'Einstein Bot Engaged Sessions',p:625,a:null,u:0},{t:'EmbeddedServiceMessagingUserPsl',p:25,a:0,u:0}]},
+  },
+};
+
+// === UTILIZATION HELPERS ===
+function getEUColor(pct) {
+  if (pct === 0) return '#c62828';
+  if (pct <= 25) return '#e57373';
+  if (pct <= 50) return '#ff8f00';
+  if (pct <= 75) return '#64b5f6';
+  if (pct <= 100) return '#1565c0';
+  return '#f9a825';
+}
+
+const FOOTPRINT_TO_AV = {
+  'Sales & Service Cloud': 'Cross Cloud - CRM',
+  'Service Cloud Agentforce': 'Service',
+  'Agentforce': 'AI and Data',
+  'Marketing Cloud': 'Marketing',
+  'Experience Cloud': 'Service',
+  'Commerce': 'Commerce',
+  'Data Cloud': 'AI and Data',
+  'Platform': 'Salesforce Platform',
+  'Tableau': 'Analytics',
+  'Maps': 'Sales',
+  'Slack': null,
+  'MuleSoft': null,
+  'Own': null,
+  'Foundations': null,
+  'Premier Success': null
+};
+
+function getBrandCatEU(brand, footprintCat) {
+  const brandData = UTIL_BY_BRAND[brand];
+  if (!brandData) return null;
+  const avCat = FOOTPRINT_TO_AV[footprintCat];
+  if (!avCat) return null;
+  const catData = brandData[avCat];
+  if (!catData) return null;
+  return catData.eu;
+}
+
+function buildUtilHtml(brand, footprintCat) {
+  const brandData = UTIL_BY_BRAND[brand];
+  if (!brandData) return '';
+  const avCat = FOOTPRINT_TO_AV[footprintCat];
+  if (!avCat) return '';
+  const catData = brandData[avCat];
+  if (!catData) return '';
+  const pct = catData.eu;
+  const color = getEUColor(pct);
+  return `<span class="detail-item-util"><span class="mini-eu-label">utilization</span><span class="mini-eu-bar"><span class="mini-eu-fill" style="width:${Math.min(pct, 100)}%;background:${color};"></span></span><span class="mini-eu-pct" style="color:${color};">${pct}%</span></span>`;
+}
+
 // === CONFIGURATION ===
 const BRANDS = [
   'HNI - Workplace Furnishings',
@@ -817,6 +1020,7 @@ const CAT_COLORS = {
 let activeCategories = new Set();
 let activeBrands = new Set();
 let wsMode = false;
+let utilMaxPct = 100;
 let expandedRows = new Set();
 
 // === HELPERS ===
@@ -999,7 +1203,10 @@ function renderHeatmap() {
         const intensity = logMax > 0 ? logVal / logMax : 0;
         const bgColor = getIntensityColor(color, intensity);
         const lightText = isLightColor(color, intensity);
-        html += `<td class="heatmap-cell" style="width:${cellWidth}px;"><div class="cell-inner filled clickable-cell${lightText ? ' light-text' : ''}" style="background:${bgColor};height:${colCount<=3?'64px':'44px'};font-size:${colCount<=3?'15px':'12px'};cursor:pointer;" data-brand="${brand}" data-cat="${cat}" data-val="${val}" data-products="${prodCount}">${formatNum(val)}<span class="cell-prod-count">${prodCount}p</span></div></td>`;
+        const cellEU = getBrandCatEU(brand, cat);
+        const dimmed = (utilMaxPct < 100 && cellEU !== null && cellEU > utilMaxPct);
+        const dimStyle = dimmed ? 'opacity:0.15;' : '';
+        html += `<td class="heatmap-cell" style="width:${cellWidth}px;"><div class="cell-inner filled clickable-cell${lightText ? ' light-text' : ''}" style="${dimStyle}background:${bgColor};height:${colCount<=3?'64px':'44px'};font-size:${colCount<=3?'15px':'12px'};cursor:pointer;" data-brand="${brand}" data-cat="${cat}" data-val="${val}" data-products="${prodCount}">${formatNum(val)}<span class="cell-prod-count">${prodCount}p</span></div></td>`;
       } else {
         html += `<td class="heatmap-cell" style="width:${cellWidth}px;"><div class="cell-inner empty" style="height:${colCount<=3?'64px':'44px'};" data-brand="${brand}" data-cat="${cat}" data-val="0" data-products="0">&mdash;</div></td>`;
       }
@@ -1082,9 +1289,18 @@ function renderHeatmap() {
       const existingCard = table.querySelector(`.detail-card[data-key="${CSS.escape(key)}"]`);
       if (existingCard) {
         cell.classList.remove('cell-active-source');
-        const parentFlex = existingCard.closest('.detail-row-flex');
+        cell.style.outlineColor = '';
+        const detailInsertRow = existingCard.closest('.detail-insert-row');
         existingCard.remove();
-        if (parentFlex && !parentFlex.children.length) parentFlex.closest('.detail-insert-row').remove();
+        if (detailInsertRow) {
+          const leftC = detailInsertRow.querySelector('.detail-row-left');
+          const rightC = detailInsertRow.querySelector('.detail-row-right');
+          if (!leftC.children.length && !rightC.children.length) {
+            detailInsertRow.remove();
+          } else {
+            setTimeout(() => drawCurves(cat), 20);
+          }
+        }
         return;
       }
 
@@ -1151,6 +1367,8 @@ function renderHeatmap() {
         listHtml += `<li><span class="detail-item-name">${p.name}</span><span class="detail-item-qty">${p.qty.toLocaleString()}</span></li>`;
       });
 
+      const utilHtml = buildUtilHtml(brand, cat);
+
       // Create card with distinct brand color
       const card = document.createElement('div');
       card.className = 'detail-card';
@@ -1164,6 +1382,7 @@ function renderHeatmap() {
           <span class="detail-card-brand" style="background:${brandColor};">${BRAND_SHORT[brand]}</span>
           <button class="detail-card-close">&times;</button>
         </div>
+        ${utilHtml ? '<div style="margin-bottom:6px;">'+utilHtml+'</div>' : ''}
         <ul class="detail-list">${listHtml}</ul>
       `;
 
@@ -1325,11 +1544,21 @@ document.addEventListener('DOMContentLoaded', () => {
     applyFilters();
   });
 
+  // Utilization slider
+  document.getElementById('utilSlider').addEventListener('input', (e) => {
+    utilMaxPct = parseInt(e.target.value);
+    document.getElementById('utilSliderVal').textContent = utilMaxPct === 100 ? '≤ 100%' : '≤ ' + utilMaxPct + '%';
+    applyFilters();
+  });
+
   // Clear all
   document.getElementById('clearAll').addEventListener('click', () => {
     activeCategories.clear();
     activeBrands.clear();
     wsMode = false;
+    utilMaxPct = 100;
+    document.getElementById('utilSlider').value = 100;
+    document.getElementById('utilSliderVal').textContent = '≤ 100%';
     document.getElementById('wsToggle').classList.remove('active');
     renderPills();
     applyFilters();
