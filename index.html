@@ -639,7 +639,7 @@ body {
     <div class="header-left">
       <h1>HNI Corporation</h1>
       <div class="subtitle">Salesforce Portfolio Footprint</div>
-      <div class="meta">11 Orgs &middot; 15 Clouds &middot; 114 Products</div>
+      <div class="meta">10 Accounts &middot; 16 Categories &middot; 82 Products &middot; 114 Total Provisioned Lines</div>
     </div>
     <div class="header-badge">Utilization data: end of May – June 10, 2026</div>
   </div>
@@ -662,6 +662,7 @@ body {
       <input type="range" class="util-slider" id="utilSlider" min="0" max="100" value="100">
       <span class="util-slider-val" id="utilSliderVal">≤ 100%</span>
     </span>
+    <span class="pill pill-whitespace" id="overUtilToggle" style="margin-left:8px;">Over 100%</span>
     <span class="pill pill-clear" id="clearAll">Clear All</span>
   </div>
 </div>
@@ -747,7 +748,7 @@ const DATA = [
   ['Fireside Hearth & Home','00DfI000008xwN5UAI','Salesforce Maps - Unlimited Edition','Maps',60],
   ['Heatilator,Heat-N-Glo,Aladdin Hearth','recover_hipaa4_1001019','Own Accelerate (Azure)','Own',294],
   ['Heatilator,Heat-N-Glo,Aladdin Hearth','recover_hipaa4_1001019','Own Recover (Azure)','Own',294],
-  ['Heatilator,Heat-N-Glo,Aladdin Hearth','','Own Premier Support','Own',294],
+  ['Heatilator,Heat-N-Glo,Aladdin Hearth','','Own Premier Support','Own Premier Support',294],
   ['Heatilator,Heat-N-Glo,Aladdin Hearth','','Own Unlimited for Salesforce - Members','Own',10000],
   ['Steelcase MAIN','archive_hipaa4_00DHp000001srnJMAQ','Own Archive (Azure)','Own',251],
   ['Steelcase MAIN','recover_hipaa4_1000156','Own Accelerate (Azure)','Own',1601],
@@ -906,6 +907,7 @@ const FOOTPRINT_TO_AV = {
   'Slack': null,
   'MuleSoft': null,
   'Own': null,
+  'Own Premier Support': null,
   'Foundations': null,
   'Premier Success': null
 };
@@ -973,6 +975,7 @@ const ALL_CATEGORIES = [
   'Slack',
   'MuleSoft',
   'Own',
+  'Own Premier Support',
   'Foundations',
   'Premier Success'
 ];
@@ -1012,6 +1015,7 @@ const CAT_COLORS = {
   'Slack': '#611f69',
   'MuleSoft': '#00b0ff',
   'Own': '#546e7a',
+  'Own Premier Support': '#455a64',
   'Foundations': '#8d6e63',
   'Premier Success': '#78909c'
 };
@@ -1021,6 +1025,7 @@ let activeCategories = new Set();
 let activeBrands = new Set();
 let wsMode = false;
 let utilMaxPct = 100;
+let overUtilMode = false;
 let expandedRows = new Set();
 
 // === HELPERS ===
@@ -1204,7 +1209,9 @@ function renderHeatmap() {
         const bgColor = getIntensityColor(color, intensity);
         const lightText = isLightColor(color, intensity);
         const cellEU = getBrandCatEU(brand, cat);
-        const dimmed = (utilMaxPct < 100 && cellEU !== null && cellEU > utilMaxPct);
+        const dimmedBySlider = (utilMaxPct < 100 && cellEU !== null && cellEU > utilMaxPct);
+        const dimmedByOver = (overUtilMode && (cellEU === null || cellEU < 100));
+        const dimmed = dimmedBySlider || dimmedByOver;
         const dimStyle = dimmed ? 'opacity:0.15;' : '';
         html += `<td class="heatmap-cell" style="width:${cellWidth}px;"><div class="cell-inner filled clickable-cell${lightText ? ' light-text' : ''}" style="${dimStyle}background:${bgColor};height:${colCount<=3?'64px':'44px'};font-size:${colCount<=3?'15px':'12px'};cursor:pointer;" data-brand="${brand}" data-cat="${cat}" data-val="${val}" data-products="${prodCount}">${formatNum(val)}<span class="cell-prod-count">${prodCount}p</span></div></td>`;
       } else {
@@ -1551,15 +1558,24 @@ document.addEventListener('DOMContentLoaded', () => {
     applyFilters();
   });
 
+  // Over 100% toggle
+  document.getElementById('overUtilToggle').addEventListener('click', () => {
+    overUtilMode = !overUtilMode;
+    document.getElementById('overUtilToggle').classList.toggle('active', overUtilMode);
+    applyFilters();
+  });
+
   // Clear all
   document.getElementById('clearAll').addEventListener('click', () => {
     activeCategories.clear();
     activeBrands.clear();
     wsMode = false;
+    overUtilMode = false;
     utilMaxPct = 100;
     document.getElementById('utilSlider').value = 100;
     document.getElementById('utilSliderVal').textContent = '≤ 100%';
     document.getElementById('wsToggle').classList.remove('active');
+    document.getElementById('overUtilToggle').classList.remove('active');
     renderPills();
     applyFilters();
   });
