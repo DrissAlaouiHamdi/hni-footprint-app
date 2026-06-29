@@ -124,6 +124,45 @@ body {
 .meta-popup.products-popup ul {
   column-count: 3;
 }
+.meta-popup li.clickable-item {
+  cursor: pointer;
+  padding: 3px 6px;
+  border-radius: 4px;
+  transition: background 0.1s;
+}
+.meta-popup li.clickable-item:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+.discrete-filter-bar {
+  background: #0176d3;
+  color: #fff;
+  padding: 6px 28px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.discrete-filter-label {
+  opacity: 0.7;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.discrete-filter-value {
+  font-weight: 700;
+}
+.discrete-filter-clear {
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: 8px;
+  opacity: 0.7;
+  transition: opacity 0.1s;
+}
+.discrete-filter-clear:hover {
+  opacity: 1;
+}
 
 /* === CONTAINER === */
 .container {
@@ -731,6 +770,13 @@ body {
   </div>
 </div>
 
+<!-- Discrete filter indicator -->
+<div class="discrete-filter-bar" id="discreteFilterBar" style="display:none;">
+  <span class="discrete-filter-label">Showing:</span>
+  <span class="discrete-filter-value" id="discreteFilterValue"></span>
+  <span class="discrete-filter-clear" id="discreteFilterClear">&times;</span>
+</div>
+
 <!-- Heatmap -->
 <div class="container">
   <div class="heatmap-section">
@@ -1091,6 +1137,7 @@ let wsMode = false;
 let utilMaxPct = 100;
 let overUtilMode = false;
 let zeroUtilMode = false;
+let discreteProductFilter = null;
 let expandedRows = new Set();
 
 // === HELPERS ===
@@ -1277,7 +1324,8 @@ function renderHeatmap() {
         const dimmedBySlider = (utilMaxPct < 100 && cellEU !== null && cellEU > utilMaxPct);
         const dimmedByOver = (overUtilMode && (cellEU === null || cellEU < 100));
         const dimmedByZero = (zeroUtilMode && (cellEU === null || cellEU !== 0));
-        const dimmed = dimmedBySlider || dimmedByOver || dimmedByZero;
+        const dimmedByProduct = (discreteProductFilter && !prodList.some(p => p.name === discreteProductFilter));
+        const dimmed = dimmedBySlider || dimmedByOver || dimmedByZero || dimmedByProduct;
         const dimStyle = dimmed ? 'opacity:0.15;' : '';
         html += `<td class="heatmap-cell" style="width:${cellWidth}px;"><div class="cell-inner filled clickable-cell${lightText ? ' light-text' : ''}" style="${dimStyle}background:${bgColor};height:${colCount<=3?'64px':'44px'};font-size:${colCount<=3?'15px':'12px'};cursor:pointer;" data-brand="${brand}" data-cat="${cat}" data-val="${val}" data-products="${prodCount}">${formatNum(val)}<span class="cell-prod-count">${prodCount}p</span></div></td>`;
       } else {
@@ -1650,8 +1698,22 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.meta-popup').forEach(p => p.remove());
     const popup = document.createElement('div');
     popup.className = 'meta-popup visible' + (isProducts ? ' products-popup' : '');
-    popup.innerHTML = `<h5>${title}</h5><ul>${items.map(i => '<li>'+i+'</li>').join('')}</ul>`;
+    const liClass = isProducts ? ' class="clickable-item"' : '';
+    popup.innerHTML = `<h5>${title}</h5><ul>${items.map(i => `<li${liClass}>${i}</li>`).join('')}</ul>`;
     document.body.appendChild(popup);
+
+    if (isProducts) {
+      popup.querySelectorAll('.clickable-item').forEach(li => {
+        li.addEventListener('click', (e) => {
+          e.stopPropagation();
+          discreteProductFilter = li.textContent;
+          document.getElementById('discreteFilterBar').style.display = 'flex';
+          document.getElementById('discreteFilterValue').textContent = discreteProductFilter;
+          popup.remove();
+          applyFilters();
+        });
+      });
+    }
   }
 
   function hideMetaPopup() {
@@ -1685,6 +1747,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, true);
 
+  // Discrete filter clear
+  document.getElementById('discreteFilterClear').addEventListener('click', () => {
+    discreteProductFilter = null;
+    document.getElementById('discreteFilterBar').style.display = 'none';
+    applyFilters();
+  });
+
   // Clear all
   document.getElementById('clearAll').addEventListener('click', () => {
     activeCategories.clear();
@@ -1692,6 +1761,8 @@ document.addEventListener('DOMContentLoaded', () => {
     wsMode = false;
     overUtilMode = false;
     zeroUtilMode = false;
+    discreteProductFilter = null;
+    document.getElementById('discreteFilterBar').style.display = 'none';
     utilMaxPct = 100;
     document.getElementById('utilSlider').value = 100;
     document.getElementById('utilSliderVal').textContent = '≤ 100%';
