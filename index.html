@@ -1363,7 +1363,16 @@ function renderHeatmap() {
         const lightText = isLightColor(color, intensity);
         const cellEU = getBrandCatEU(brand, cat);
         const dimmedBySlider = (utilMaxPct < 100 && cellEU !== null && cellEU > utilMaxPct);
-        const dimmedByOver = (overUtilMode && (cellEU === null || cellEU < 100));
+        // Over 100% checks individual products, not just the aggregate
+        let hasOverProduct = false;
+        if (overUtilMode) {
+          const bUtil = UTIL_BY_BRAND[brand];
+          const avC = FOOTPRINT_TO_AV[cat];
+          if (bUtil && avC && bUtil[avC] && bUtil[avC].products) {
+            hasOverProduct = bUtil[avC].products.some(p => p.p > 0 && p.u !== null && (p.u / p.p) > 1);
+          }
+        }
+        const dimmedByOver = (overUtilMode && !hasOverProduct);
         const dimmedByZero = (zeroUtilMode && (cellEU === null || cellEU !== 0));
         const dimmedByProduct = (discreteProductFilter && !prodList.some(p => p.name === discreteProductFilter));
         const dimmed = dimmedBySlider || dimmedByOver || dimmedByZero || dimmedByProduct;
