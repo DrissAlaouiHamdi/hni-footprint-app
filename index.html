@@ -1720,30 +1720,42 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.meta-popup').forEach(p => p.remove());
   }
 
+  let metaHideTimeout = null;
+
+  function scheduleHide() {
+    metaHideTimeout = setTimeout(hideMetaPopup, 200);
+  }
+  function cancelHide() {
+    if (metaHideTimeout) { clearTimeout(metaHideTimeout); metaHideTimeout = null; }
+  }
+
   document.getElementById('metaAccounts').addEventListener('mouseenter', () => {
+    cancelHide();
     showMetaPopup(`${accountsList.length} Accounts`, accountsList, false);
   });
-  document.getElementById('metaAccounts').addEventListener('mouseleave', hideMetaPopup);
+  document.getElementById('metaAccounts').addEventListener('mouseleave', scheduleHide);
 
   document.getElementById('metaCategories').addEventListener('mouseenter', () => {
+    cancelHide();
     showMetaPopup(`${categoriesList.length} Categories`, categoriesList, false);
   });
-  document.getElementById('metaCategories').addEventListener('mouseleave', hideMetaPopup);
+  document.getElementById('metaCategories').addEventListener('mouseleave', scheduleHide);
 
   document.getElementById('metaProducts').addEventListener('mouseenter', () => {
+    cancelHide();
     showMetaPopup(`${productsList.length} Products`, productsList, true);
   });
-  document.getElementById('metaProducts').addEventListener('mouseleave', hideMetaPopup);
+  document.getElementById('metaProducts').addEventListener('mouseleave', scheduleHide);
 
   // Keep popup open while hovering over it
   document.addEventListener('mouseenter', (e) => {
-    if (e.target.classList && e.target.classList.contains('meta-popup')) {
-      e.target.classList.add('visible');
+    if (e.target.closest && e.target.closest('.meta-popup')) {
+      cancelHide();
     }
   }, true);
   document.addEventListener('mouseleave', (e) => {
-    if (e.target.classList && e.target.classList.contains('meta-popup')) {
-      e.target.remove();
+    if (e.target.closest && e.target.closest('.meta-popup') && !e.relatedTarget?.closest?.('.meta-popup')) {
+      scheduleHide();
     }
   }, true);
 
