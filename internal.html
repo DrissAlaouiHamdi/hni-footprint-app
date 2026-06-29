@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HNI + Steelcase — Internal Command Center</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+            background: #0f172a;
+            color: #e2e8f0;
+            line-height: 1.5;
+            padding: 24px 32px;
+        }
+
+        a {
+            color: #60a5fa;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Header */
+        .header {
+            border-bottom: 1px solid #334155;
+            padding-bottom: 20px;
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            color: #f8fafc;
+            margin-bottom: 4px;
+        }
+
+        .header .subtitle {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+
+        .header .badge {
+            display: inline-block;
+            background: #1e293b;
+            border: 1px solid #475569;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: #fbbf24;
+            margin-bottom: 10px;
+        }
+
+        .header .nav-link {
+            display: block;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 32px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 10px 14px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 6px 6px 0 0;
+            user-select: none;
+        }
+
+        .section-header:hover {
+            background: #253347;
+        }
+
+        .section-header h2 {
+            font-size: 1rem;
+            color: #f1f5f9;
+            font-weight: 600;
+        }
+
+        .section-header .toggle {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-left: auto;
+        }
+
+        .section-body {
+            border: 1px solid #334155;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            padding: 16px;
+            background: #0f172a;
+        }
+
+        .section.collapsed .section-body {
+            display: none;
+        }
+
+        .section.collapsed .section-header {
+            border-radius: 6px;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 12px;
+        }
+
+        .card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 14px;
+        }
+
+        .card-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #f8fafc;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-meta {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+
+        .card-signal {
+            font-size: 0.75rem;
+            color: #cbd5e1;
+            font-style: italic;
+            margin-top: 6px;
+            border-top: 1px solid #334155;
+            padding-top: 6px;
+        }
+
+        .dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .dot-green { background: #22c55e; }
+        .dot-yellow { background: #eab308; }
+        .dot-red { background: #ef4444; }
+        .dot-gray { background: #64748b; }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78rem;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 8px 10px;
+            background: #1e293b;
+            color: #94a3b8;
+            font-weight: 600;
+            border-bottom: 1px solid #334155;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #1e293b;
+            color: #e2e8f0;
+        }
+
+        .data-table tr:hover td {
+            background: #1e293b;
+        }
+
+        .data-table .amount {
+            font-weight: 600;
+            color: #34d399;
+        }
+
+        /* Alert Cards */
+        .alerts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 10px;
+        }
+
+        .alert-card {
+            padding: 12px 14px;
+            border-radius: 6px;
+            border-left: 4px solid;
+        }
+
+        .alert-red {
+            background: rgba(239, 68, 68, 0.08);
+            border-color: #ef4444;
+        }
+
+        .alert-orange {
+            background: rgba(249, 115, 22, 0.08);
+            border-color: #f97316;
+        }
+
+        .alert-yellow {
+            background: rgba(234, 179, 8, 0.08);
+            border-color: #eab308;
+        }
+
+        .alert-title {
+            font-size: 0.82rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #f8fafc;
+        }
+
+        .alert-desc {
+            font-size: 0.75rem;
+            color: #cbd5e1;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 24px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #334155;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 16px;
+            padding-left: 20px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 6px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #475569;
+            border: 2px solid #64748b;
+        }
+
+        .timeline-item.active::before {
+            background: #22c55e;
+            border-color: #22c55e;
+        }
+
+        .timeline-date {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .timeline-desc {
+            font-size: 0.8rem;
+            color: #e2e8f0;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            padding-top: 16px;
+            border-top: 1px solid #334155;
+            font-size: 0.7rem;
+            color: #475569;
+            text-align: center;
+        }
+
+        /* Pipeline total */
+        .pipeline-total {
+            margin-top: 12px;
+            padding: 8px 14px;
+            background: #1e293b;
+            border-radius: 4px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #34d399;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <h1>HNI + Steelcase — Internal Command Center</h1>
+    <div class="subtitle">Driss Alaoui | FY27 Renewal Prep | NOT FOR CUSTOMER DISTRIBUTION</div>
+    <div class="badge">Total Renewal ACV: ~$4.9M | Window: Dec 2026 – Jan 2027</div>
+    <a href="index.html" class="nav-link">&rarr; Customer-Facing App</a>
+</div>
+
+<!-- Section 1: Portfolio Overview -->
+<div class="section" id="section-portfolio">
+    <div class="section-header" onclick="toggleSection('section-portfolio')">
+        <h2>1. Portfolio Overview</h2>
+        <span class="toggle">[collapse]</span>
+    </div>
+    <div class="section-body">
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-title"><span class="dot dot-green"></span> Steelcase MAIN</div>
+                <div class="card-meta">Org ID: 00D30000000pMuFEAU</div>
+                <div class="card-meta">Renewal: <strong>$2,186,000 + $504,900 Tableau</strong></div>
+                <div class="card-meta">Close: Dec 14–25, 2026 | Stage: Renewal</div>
+                <div class="card-meta">Risk: <span style="color:#22c55e;">GREEN</span> (fragile)</div>
+                <div class="card-signal">Zero predicted attrition; B2B migration risk</div>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="dot dot-yellow"></span> HNI Corporation</div>
+                <div class="card-meta">Org ID: 00D300000006BaHEAU</div>
+                <div class="card-meta">Renewal: <strong>$1,238,174</strong></div>
+                <div class="card-meta">Close: Jan 31, 2027 | Stage: Renewal</div>
+                <div class="card-meta">Risk: <span style="color:#eab308;">YELLOW</span></div>
+                <div class="card-signal">18.8% attrition forecast; license reduction planned</div>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="dot dot-green"></span> Kimball International</div>
+                <div class="card-meta">Org ID: 00D4x000003yaYtEAI</div>
+                <div class="card-meta">Renewal: <strong>$628,600</strong></div>
+                <div class="card-meta">Close: 2028 | Stage: Future</div>
+                <div class="card-meta">Risk: <span style="color:#22c55e;">GREEN</span></div>
+                <div class="card-signal">Agentforce & OMS expansion pipeline</div>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="dot dot-green"></span> Hearth & Home Technologies</div>
+                <div class="card-meta">Org ID: 00D4x000007kYIlEAM</div>
+                <div class="card-meta">Renewal: <strong>$520,578 + $125,850 Tableau</strong></div>
+                <div class="card-meta">Close: Jan 30–31, 2027 | Stage: Renewal</div>
+                <div class="card-meta">Risk: <span style="color:#22c55e;">GREEN</span></div>
+                <div class="card-signal">Agentforce expansion active</div>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="dot dot-yellow"></span> Designtex Group</div>
+                <div class="card-meta">Org ID: 00D30000001EIIFEA4</div>
+                <div class="card-meta">Renewal: <strong>$97,452</strong></div>
+                <div class="card-meta">Close: Dec 13, 2026 | Stage: Renewal</div>
+                <div class="card-meta">Risk: <span style="color:#eab308;">YELLOW</span></div>
+                <div class="card-signal">98% activation but low rep usage</div>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="dot dot-green"></span> Steelcase Proxy Org</div>
+                <div class="card-meta">Org ID: 00DA0000000K9crMAC</div>
+                <div class="card-meta">Renewal: <strong>$65,696</strong></div>
+                <div class="card-meta">Close: Dec 14, 2026 | Stage: Renewal</div>
+                <div class="card-meta">Risk: <span style="color:#22c55e;">GREEN</span></div>
+                <div class="card-signal">500 Partner, 10 Full CRM</div>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="dot dot-yellow"></span> Smith System Furniture</div>
+                <div class="card-meta">Org ID: 00D30000001EI9DEAW</div>
+                <div class="card-meta">Renewal: <strong>$51,700</strong></div>
+                <div class="card-meta">Close: Dec 18, 2026 | Stage: Renewal</div>
+                <div class="card-meta">Risk: <span style="color:#eab308;">YELLOW</span></div>
+                <div class="card-signal">69 SFA licenses; low rep usage</div>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="dot dot-green"></span> AMQ Solutions</div>
+                <div class="card-meta">Org ID: 00D4x000003yDO9EAM</div>
+                <div class="card-meta">Renewal: <strong>$50,939</strong></div>
+                <div class="card-meta">Close: Dec 14, 2026 | Stage: Renewal</div>
+                <div class="card-meta">Risk: <span style="color:#22c55e;">GREEN</span></div>
+                <div class="card-signal">67 SFA, 3 Partner; stable</div>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="dot dot-gray"></span> Steelcase Financial Services</div>
+                <div class="card-meta">Org ID: —</div>
+                <div class="card-meta">Renewal: <strong>No open opps</strong></div>
+                <div class="card-meta">Close: — | Stage: —</div>
+                <div class="card-meta">Risk: <span style="color:#64748b;">UNKNOWN</span></div>
+                <div class="card-signal">No pipeline; unclear usage</div>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="dot dot-yellow"></span> Smith System (legacy)</div>
+                <div class="card-meta">Org ID: legacy</div>
+                <div class="card-meta">Renewal: <strong>—</strong></div>
+                <div class="card-meta">Close: — | Stage: —</div>
+                <div class="card-meta">Risk: <span style="color:#eab308;">YELLOW</span></div>
+                <div class="card-signal">Low adoption; manual processes</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Section 2: Driss's Pipeline -->
+<div class="section" id="section-pipeline">
+    <div class="section-header" onclick="toggleSection('section-pipeline')">
+        <h2>2. Driss's Pipeline</h2>
+        <span class="toggle">[collapse]</span>
+    </div>
+    <div class="section-body">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Opportunity</th>
+                    <th>Account</th>
+                    <th>Amount</th>
+                    <th>Close Date</th>
+                    <th>Stage</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Regrello Supply Chain #AFSupplyChain</td>
+                    <td>HNI</td>
+                    <td class="amount">$500,000</td>
+                    <td>Oct 15, 2026</td>
+                    <td>Stage 1</td>
+                </tr>
+                <tr>
+                    <td>Steelcase Marketing Next</td>
+                    <td>Steelcase</td>
+                    <td class="amount">$450,000</td>
+                    <td>Nov 30, 2026</td>
+                    <td>Pipeline</td>
+                </tr>
+                <tr>
+                    <td>Steelcase Data360</td>
+                    <td>Steelcase</td>
+                    <td class="amount">$350,000</td>
+                    <td>Nov 30, 2026</td>
+                    <td>Pipeline</td>
+                </tr>
+                <tr>
+                    <td>HNI Agentforce</td>
+                    <td>HNI</td>
+                    <td class="amount">$300,000</td>
+                    <td>Oct 16, 2026</td>
+                    <td>Stage 1</td>
+                </tr>
+                <tr>
+                    <td>Full-Copy Sandbox</td>
+                    <td>HNI</td>
+                    <td class="amount">$100,500</td>
+                    <td>Dec 31, 2026</td>
+                    <td>Stage 5 Negotiating</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="pipeline-total">Total Pipeline: $1.7M</div>
+    </div>
+</div>
+
+<!-- Section 3: Critical Signals -->
+<div class="section" id="section-signals">
+    <div class="section-header" onclick="toggleSection('section-signals')">
+        <h2>3. Critical Signals</h2>
+        <span class="toggle">[collapse]</span>
+    </div>
+    <div class="section-body">
+        <div class="alerts-grid">
+            <div class="alert-card alert-red">
+                <div class="alert-title">&#x1F534; OroCommerce Threat</div>
+                <div class="alert-desc">Steelcase building B2B portal on OroCommerce — "reduce custom dev by 80%"</div>
+            </div>
+            <div class="alert-card alert-red">
+                <div class="alert-title">&#x1F534; Steelcase Data Services</div>
+                <div class="alert-desc">209% utilization (536.9K vs allowance) — CRITICAL OVERAGE</div>
+            </div>
+            <div class="alert-card alert-orange">
+                <div class="alert-title">&#x1F7E0; HNI Attrition</div>
+                <div class="alert-desc">18.8% forecast reduction ($286K at risk). License reduction planned. 793 Service Cloud licenses — actual MAU unknown.</div>
+            </div>
+            <div class="alert-card alert-orange">
+                <div class="alert-title">&#x1F7E0; Microsoft Competitive</div>
+                <div class="alert-desc">IT preference for Power Automate, Azure, Teams, Co-Pilot at Steelcase</div>
+            </div>
+            <div class="alert-card alert-orange">
+                <div class="alert-title">&#x1F7E0; HubSpot</div>
+                <div class="alert-desc">Active use at Steelcase — diehards resisting Marketing Cloud migration</div>
+            </div>
+            <div class="alert-card alert-yellow">
+                <div class="alert-title">&#x1F7E1; Data Cloud Non-Renewal</div>
+                <div class="alert-desc">HNI opted out of Data Cloud renewal — why? Re-engagement opportunity?</div>
+            </div>
+            <div class="alert-card alert-yellow">
+                <div class="alert-title">&#x1F7E1; Zero Contact Roles</div>
+                <div class="alert-desc">Cannot identify key decision-makers at HNI Main</div>
+            </div>
+            <div class="alert-card alert-yellow">
+                <div class="alert-title">&#x1F7E1; Partner Community Overage</div>
+                <div class="alert-desc">HNI 196K vs 178K allowance (110%) — clean upsell</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Section 4: Utilization Red Flags (DATA-VERIFIED) -->
+<div class="section" id="section-utilization">
+    <div class="section-header" onclick="toggleSection('section-utilization')">
+        <h2>4. Utilization Red Flags — Data-Verified</h2>
+        <span class="toggle">[collapse]</span>
+    </div>
+    <div class="section-body">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Brand</th>
+                    <th>Product</th>
+                    <th>Provisioned</th>
+                    <th>Used</th>
+                    <th>EU%</th>
+                    <th>Signal</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Steelcase</td>
+                    <td>GenieDataPlatformStarterPsl</td>
+                    <td>1</td>
+                    <td>8</td>
+                    <td style="color:#ef4444;font-weight:700;">800%</td>
+                    <td>Overage (trivial volume)</td>
+                    <td style="color:#22c55e;">AV Data ✓</td>
+                </tr>
+                <tr>
+                    <td>Steelcase</td>
+                    <td>Active Storefronts</td>
+                    <td>3</td>
+                    <td>4</td>
+                    <td style="color:#ef4444;font-weight:700;">133%</td>
+                    <td>Overage — needs expansion</td>
+                    <td style="color:#22c55e;">AV Data ✓</td>
+                </tr>
+                <tr>
+                    <td>HNI</td>
+                    <td>Partner Community Logins</td>
+                    <td>168,000</td>
+                    <td>182,782</td>
+                    <td style="color:#f97316;font-weight:700;">109%</td>
+                    <td>Overage — clean upsell</td>
+                    <td style="color:#22c55e;">AV Data ✓</td>
+                </tr>
+                <tr>
+                    <td>HNI</td>
+                    <td>SFDC (Service Cloud)</td>
+                    <td>858</td>
+                    <td>760</td>
+                    <td style="color:#60a5fa;font-weight:700;">89%</td>
+                    <td>Healthy — NOT shelfware</td>
+                    <td style="color:#22c55e;">AV Data ✓</td>
+                </tr>
+                <tr>
+                    <td>Steelcase</td>
+                    <td>File Storage</td>
+                    <td>3,652,996</td>
+                    <td>1,877,266</td>
+                    <td style="color:#eab308;font-weight:700;">51%</td>
+                    <td>Moderate — not 85% as reported</td>
+                    <td style="color:#22c55e;">AV Data ✓</td>
+                </tr>
+                <tr>
+                    <td>Kimball</td>
+                    <td>Commerce Cloud GMV</td>
+                    <td>6,000,000</td>
+                    <td>0</td>
+                    <td style="color:#ef4444;font-weight:700;">0%</td>
+                    <td>Bought, never used</td>
+                    <td style="color:#22c55e;">AV Data ✓</td>
+                </tr>
+                <tr>
+                    <td>HNI</td>
+                    <td>AccountEngagementPsl (Pardot)</td>
+                    <td>1,000</td>
+                    <td>8</td>
+                    <td style="color:#ef4444;font-weight:700;">1%</td>
+                    <td>Near-zero adoption</td>
+                    <td style="color:#22c55e;">AV Data ✓</td>
+                </tr>
+                <tr style="border-top:2px solid #334155;">
+                    <td>Steelcase</td>
+                    <td>Data Services Credits</td>
+                    <td>536.9K?</td>
+                    <td>209%?</td>
+                    <td style="color:#ef4444;font-weight:700;">209%?</td>
+                    <td>UNVERIFIED — not in AV export</td>
+                    <td style="color:#eab308;">Report only ⚠️</td>
+                </tr>
+                <tr>
+                    <td>HNI</td>
+                    <td>Corporate Edition Contacts</td>
+                    <td>?</td>
+                    <td>107%?</td>
+                    <td>—</td>
+                    <td>UNVERIFIED — no matching data</td>
+                    <td style="color:#eab308;">Report only ⚠️</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Section 4b: Data Reconciliation -->
+<div class="section" id="section-reconciliation">
+    <div class="section-header" onclick="toggleSection('section-reconciliation')">
+        <h2>4b. Report vs. Data — Discrepancies</h2>
+        <span class="toggle">[collapse]</span>
+    </div>
+    <div class="section-body">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Claim in Report</th>
+                    <th>Actual Data (AV Export)</th>
+                    <th>Delta</th>
+                    <th>Impact</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Steelcase Data Services: 209% overage</td>
+                    <td>Not found in AV data files</td>
+                    <td style="color:#ef4444;">Cannot verify</td>
+                    <td>May be consumption-based metric tracked separately</td>
+                </tr>
+                <tr>
+                    <td>Steelcase File Storage: 85% utilization</td>
+                    <td>51% (3.65M provisioned, 1.88M used)</td>
+                    <td style="color:#f97316;">-34 points</td>
+                    <td>Less urgent than report suggests</td>
+                </tr>
+                <tr>
+                    <td>HNI Service Cloud: "MAU unknown", potential shelfware</td>
+                    <td>858 provisioned, 760 used = 89% EU</td>
+                    <td style="color:#22c55e;">HEALTHY</td>
+                    <td style="color:#22c55e;font-weight:700;">Changes the narrative — not shelfware</td>
+                </tr>
+                <tr>
+                    <td>HNI Service Cloud: 793 licenses</td>
+                    <td>AV shows 858 provisioned (793 + 65 Agentforce)</td>
+                    <td style="color:#eab308;">+65</td>
+                    <td>Agentforce licenses bundled in AV count</td>
+                </tr>
+                <tr>
+                    <td>Partner Community: 196K vs 178K allowance (110%)</td>
+                    <td>168K provisioned, 182K used (109%)</td>
+                    <td style="color:#22c55e;">~Same</td>
+                    <td>Directionally correct — overage confirmed</td>
+                </tr>
+                <tr>
+                    <td>Hearth & Home: "Agentforce expansion active"</td>
+                    <td>All Agent products at 0% usage</td>
+                    <td style="color:#eab308;">Sales motion ≠ Adoption</td>
+                    <td>Bought but not yet deployed</td>
+                </tr>
+                <tr>
+                    <td>HNI Pardot: "utilization unclear"</td>
+                    <td>Pardot Contacts 27%, AccountEngagement 1%, Contacts 52%</td>
+                    <td style="color:#22c55e;">Data exists</td>
+                    <td>Report missed it — mixed picture (1% license, 27% contacts)</td>
+                </tr>
+                <tr>
+                    <td>Kimball Commerce: "OMS expansion" pipeline</td>
+                    <td>Commerce GMV at 0% EU ($6M provisioned, $0 used)</td>
+                    <td style="color:#ef4444;">0% usage</td>
+                    <td>Expanding something they haven't activated yet — risk</td>
+                </tr>
+            </tbody>
+        </table>
+        <div style="margin-top:16px;padding:12px 16px;background:#1a2744;border-radius:8px;border-left:4px solid #60a5fa;font-size:12px;color:#94a3b8;">
+            <strong style="color:#60a5fa;">Key Takeaway:</strong> The report and data are directionally aligned on risk (HNI = yellow, low adoption areas exist), but specific numbers diverge. The biggest correction: <strong style="color:#22c55e;">HNI Service Cloud is at 89% EU — not shelfware.</strong> Use AV data as the authoritative source for utilization claims in customer conversations.
+        </div>
+    </div>
+</div>
+
+<!-- Section 5: Competitive Landscape -->
+<div class="section" id="section-competitive">
+    <div class="section-header" onclick="toggleSection('section-competitive')">
+        <h2>5. Competitive Landscape</h2>
+        <span class="toggle">[collapse]</span>
+    </div>
+    <div class="section-body">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Competitor</th>
+                    <th>Domain</th>
+                    <th>Risk</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>OroCommerce</td>
+                    <td>B2B Portal/Commerce</td>
+                    <td style="color:#ef4444;font-weight:700;">&#x1F534; HIGH</td>
+                    <td>Active migration at Steelcase</td>
+                </tr>
+                <tr>
+                    <td>Microsoft</td>
+                    <td>AI, BI, Infrastructure</td>
+                    <td style="color:#f97316;font-weight:700;">&#x1F7E0; MEDIUM</td>
+                    <td>IT preference for Co-Pilot, Power BI, Azure</td>
+                </tr>
+                <tr>
+                    <td>HubSpot</td>
+                    <td>Marketing Automation</td>
+                    <td style="color:#f97316;font-weight:700;">&#x1F7E0; MEDIUM</td>
+                    <td>Resistance to SFMC migration</td>
+                </tr>
+                <tr>
+                    <td>ServiceNow</td>
+                    <td>ITSM/HR Service</td>
+                    <td style="color:#eab308;font-weight:700;">&#x1F7E1; LOW</td>
+                    <td>Kimball displacement target</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Section 6: Timeline & Actions -->
+<div class="section" id="section-timeline">
+    <div class="section-header" onclick="toggleSection('section-timeline')">
+        <h2>6. Timeline & Actions</h2>
+        <span class="toggle">[collapse]</span>
+    </div>
+    <div class="section-body">
+        <div class="timeline">
+            <div class="timeline-item active">
+                <div class="timeline-date">NOW – Aug 2026</div>
+                <div class="timeline-desc">Resolve dissatisfaction, 14-day intervention</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date">Sep – Oct 2026</div>
+                <div class="timeline-desc">Finalize scope, move to Qualify, align pricing</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date">Nov 2026</div>
+                <div class="timeline-desc">Move to Commit, executive alignment</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date">Dec 13–25, 2026</div>
+                <div class="timeline-desc">Steelcase cluster renewals</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date">Jan 30–31, 2027</div>
+                <div class="timeline-desc">HNI & Hearth & Home renewals</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date">2028</div>
+                <div class="timeline-desc">Kimball renewal</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Section 7: Key Contacts -->
+<div class="section" id="section-contacts">
+    <div class="section-header" onclick="toggleSection('section-contacts')">
+        <h2>7. Key Contacts</h2>
+        <span class="toggle">[collapse]</span>
+    </div>
+    <div class="section-body">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Role</th>
+                    <th>Name</th>
+                    <th>Coverage</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Named AE</td>
+                    <td>Russell Dixon</td>
+                    <td>All entities</td>
+                </tr>
+                <tr>
+                    <td>CS Lead</td>
+                    <td>Grace Yang</td>
+                    <td>Portfolio oversight</td>
+                </tr>
+                <tr>
+                    <td>Renewal Owner</td>
+                    <td>Cortney Brake</td>
+                    <td>Subsidiary renewals</td>
+                </tr>
+                <tr>
+                    <td>Price Uplift</td>
+                    <td>Nathaniel Causley</td>
+                    <td>ARY automation</td>
+                </tr>
+                <tr>
+                    <td>Core RVP</td>
+                    <td>Lucas Malemezian</td>
+                    <td>Steelcase leadership</td>
+                </tr>
+                <tr>
+                    <td>Expansion AE</td>
+                    <td>Driss Alaoui</td>
+                    <td>Agentforce, Data360, Marketing Next</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    Last updated: June 2026 | Internal use only — Driss Alaoui
+</div>
+
+<script>
+    function toggleSection(id) {
+        const section = document.getElementById(id);
+        section.classList.toggle('collapsed');
+        const toggle = section.querySelector('.toggle');
+        if (section.classList.contains('collapsed')) {
+            toggle.textContent = '[expand]';
+        } else {
+            toggle.textContent = '[collapse]';
+        }
+    }
+</script>
+
+</body>
+</html>
