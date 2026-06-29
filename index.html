@@ -67,6 +67,64 @@ body {
   white-space: nowrap;
 }
 
+.meta-chip {
+  cursor: pointer;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.25);
+  transition: background 0.15s;
+  position: relative;
+}
+.meta-chip:hover {
+  background: rgba(255,255,255,0.25);
+}
+.meta-popup {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 8px;
+  background: #fff;
+  color: #1a1a2e;
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  padding: 14px 16px;
+  z-index: 9999;
+  min-width: 240px;
+  max-width: 400px;
+  max-height: 360px;
+  overflow-y: auto;
+  font-size: 12px;
+  display: none;
+}
+.meta-popup.visible { display: block; }
+.meta-popup h5 {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6b7280;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e8eaef;
+}
+.meta-popup ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  column-count: 2;
+  column-gap: 16px;
+}
+.meta-popup li {
+  padding: 3px 0;
+  font-size: 11.5px;
+  color: #1a1a2e;
+  break-inside: avoid;
+}
+.meta-popup.products-popup ul {
+  column-count: 1;
+}
+
 /* === CONTAINER === */
 .container {
   max-width: 1600px;
@@ -639,7 +697,12 @@ body {
     <div class="header-left">
       <h1>HNI Corporation</h1>
       <div class="subtitle">Salesforce Portfolio Footprint</div>
-      <div class="meta">10 Accounts &middot; 16 Categories &middot; 82 Products &middot; 114 Total Provisioned Lines</div>
+      <div class="meta">
+        <span class="meta-chip" id="metaAccounts">10 Accounts</span> &middot;
+        <span class="meta-chip" id="metaCategories">16 Categories</span> &middot;
+        <span class="meta-chip" id="metaProducts">82 Products</span> &middot;
+        114 Total Provisioned Lines
+      </div>
     </div>
     <div class="header-badge">Utilization data: end of May – June 10, 2026</div>
   </div>
@@ -662,7 +725,8 @@ body {
       <input type="range" class="util-slider" id="utilSlider" min="0" max="100" value="100">
       <span class="util-slider-val" id="utilSliderVal">≤ 100%</span>
     </span>
-    <span class="pill pill-whitespace" id="overUtilToggle" style="margin-left:8px;">Over 100%</span>
+    <span class="pill pill-whitespace" id="overUtilToggle" style="margin-left:8px;">Over 100% Util</span>
+    <span class="pill pill-whitespace" id="zeroUtilToggle">0% Util</span>
     <span class="pill pill-clear" id="clearAll">Clear All</span>
   </div>
 </div>
@@ -1026,6 +1090,7 @@ let activeBrands = new Set();
 let wsMode = false;
 let utilMaxPct = 100;
 let overUtilMode = false;
+let zeroUtilMode = false;
 let expandedRows = new Set();
 
 // === HELPERS ===
@@ -1211,7 +1276,8 @@ function renderHeatmap() {
         const cellEU = getBrandCatEU(brand, cat);
         const dimmedBySlider = (utilMaxPct < 100 && cellEU !== null && cellEU > utilMaxPct);
         const dimmedByOver = (overUtilMode && (cellEU === null || cellEU < 100));
-        const dimmed = dimmedBySlider || dimmedByOver;
+        const dimmedByZero = (zeroUtilMode && (cellEU === null || cellEU !== 0));
+        const dimmed = dimmedBySlider || dimmedByOver || dimmedByZero;
         const dimStyle = dimmed ? 'opacity:0.15;' : '';
         html += `<td class="heatmap-cell" style="width:${cellWidth}px;"><div class="cell-inner filled clickable-cell${lightText ? ' light-text' : ''}" style="${dimStyle}background:${bgColor};height:${colCount<=3?'64px':'44px'};font-size:${colCount<=3?'15px':'12px'};cursor:pointer;" data-brand="${brand}" data-cat="${cat}" data-val="${val}" data-products="${prodCount}">${formatNum(val)}<span class="cell-prod-count">${prodCount}p</span></div></td>`;
       } else {
@@ -1561,8 +1627,56 @@ document.addEventListener('DOMContentLoaded', () => {
   // Over 100% toggle
   document.getElementById('overUtilToggle').addEventListener('click', () => {
     overUtilMode = !overUtilMode;
+    if (overUtilMode) zeroUtilMode = false;
     document.getElementById('overUtilToggle').classList.toggle('active', overUtilMode);
+    document.getElementById('zeroUtilToggle').classList.remove('active');
     applyFilters();
+  });
+
+  document.getElementById('zeroUtilToggle').addEventListener('click', () => {
+    zeroUtilMode = !zeroUtilMode;
+    if (zeroUtilMode) overUtilMode = false;
+    document.getElementById('zeroUtilToggle').classList.toggle('active', zeroUtilMode);
+    document.getElementById('overUtilToggle').classList.remove('active');
+    applyFilters();
+  });
+
+  // Meta chip popups
+  const accountsList = [...new Set(DATA.map(r => r[0]))].filter(a => a !== '(Unassigned)').sort();
+  const categoriesList = [...ALL_CATEGORIES].sort();
+  const productsList = [...new Set(DATA.map(r => r[2]))].sort();
+
+  function showMetaPopup(chipId, title, items, isProducts) {
+    // Remove existing
+    document.querySelectorAll('.meta-popup').forEach(p => p.remove());
+    const chip = document.getElementById(chipId);
+    const popup = document.createElement('div');
+    popup.className = 'meta-popup visible' + (isProducts ? ' products-popup' : '');
+    popup.innerHTML = `<h5>${title}</h5><ul>${items.map(i => '<li>'+i+'</li>').join('')}</ul>`;
+    chip.style.position = 'relative';
+    chip.appendChild(popup);
+    // Close on click outside
+    setTimeout(() => {
+      document.addEventListener('click', function closer(e) {
+        if (!popup.contains(e.target) && e.target !== chip) {
+          popup.remove();
+          document.removeEventListener('click', closer);
+        }
+      });
+    }, 10);
+  }
+
+  document.getElementById('metaAccounts').addEventListener('click', (e) => {
+    e.stopPropagation();
+    showMetaPopup('metaAccounts', `${accountsList.length} Accounts`, accountsList, false);
+  });
+  document.getElementById('metaCategories').addEventListener('click', (e) => {
+    e.stopPropagation();
+    showMetaPopup('metaCategories', `${categoriesList.length} Categories`, categoriesList, false);
+  });
+  document.getElementById('metaProducts').addEventListener('click', (e) => {
+    e.stopPropagation();
+    showMetaPopup('metaProducts', `${productsList.length} Products`, productsList, true);
   });
 
   // Clear all
@@ -1571,11 +1685,13 @@ document.addEventListener('DOMContentLoaded', () => {
     activeBrands.clear();
     wsMode = false;
     overUtilMode = false;
+    zeroUtilMode = false;
     utilMaxPct = 100;
     document.getElementById('utilSlider').value = 100;
     document.getElementById('utilSliderVal').textContent = '≤ 100%';
     document.getElementById('wsToggle').classList.remove('active');
     document.getElementById('overUtilToggle').classList.remove('active');
+    document.getElementById('zeroUtilToggle').classList.remove('active');
     renderPills();
     applyFilters();
   });
