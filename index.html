@@ -533,6 +533,30 @@ body {
   break-inside: avoid;
 }
 .detail-card .detail-list li:last-child { border-bottom: none; }
+.detail-section-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+.util-detail-section {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1.5px solid #e8eaef;
+}
+.util-detail-title {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #0176d3;
+  margin-bottom: 4px;
+}
+.util-detail-list li {
+  font-size: 10px !important;
+}
 .detail-item-name { color: #1a1a2e; font-weight: 500; flex: 1; margin-right: 6px; line-height: 1.3; word-break: break-word; white-space: normal; }
 .detail-item-qty { color: #0176d3; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
 .detail-card-close {
@@ -1482,13 +1506,37 @@ function renderHeatmap() {
       // If target is hidden, use the other side
       const finalContainer = (targetContainer.style.display === 'none') ? (isRight ? leftContainer : rightContainer) : targetContainer;
 
-      // Build list
+      // Build footprint products list
       let listHtml = '';
       [...prods].sort((a,b) => b.qty - a.qty).forEach(p => {
         listHtml += `<li><span class="detail-item-name">${p.name}</span><span class="detail-item-qty">${p.qty.toLocaleString()}</span></li>`;
       });
 
-      const utilHtml = buildUtilHtml(brand, cat);
+      // Build AV utilization detail (individual product bars)
+      const utilAggregate = buildUtilHtml(brand, cat);
+      let utilDetailHtml = '';
+      const brandUtil = UTIL_BY_BRAND[brand];
+      const avCat = FOOTPRINT_TO_AV[cat];
+      if (brandUtil && avCat && brandUtil[avCat] && brandUtil[avCat].products) {
+        const avProds = brandUtil[avCat].products;
+        utilDetailHtml = '<div class="util-detail-section"><div class="util-detail-title">Utilization by Product</div><ul class="detail-list util-detail-list">';
+        avProds.sort((a,b) => {
+          const euA = (a.p && a.u !== null) ? a.u/a.p : -1;
+          const euB = (b.p && b.u !== null) ? b.u/b.p : -1;
+          return euB - euA;
+        }).forEach(ap => {
+          let barHtml = '';
+          if (ap.p > 0 && ap.u !== null) {
+            const pct = Math.round((ap.u / ap.p) * 100);
+            const color = getEUColor(pct);
+            barHtml = `<span class="detail-item-util"><span class="mini-eu-bar"><span class="mini-eu-fill" style="width:${Math.min(pct,100)}%;background:${color};"></span></span><span class="mini-eu-pct" style="color:${color};">${pct}%</span></span>`;
+          } else {
+            barHtml = '<span class="detail-item-util"><span class="mini-eu-pct" style="color:#9ca3af;">N/A</span></span>';
+          }
+          utilDetailHtml += `<li><span class="detail-item-name">${ap.t}</span>${barHtml}</li>`;
+        });
+        utilDetailHtml += '</ul></div>';
+      }
 
       // Create card with distinct brand color
       const card = document.createElement('div');
@@ -1503,8 +1551,10 @@ function renderHeatmap() {
           <span class="detail-card-brand" style="background:${brandColor};">${BRAND_SHORT[brand]}</span>
           <button class="detail-card-close">&times;</button>
         </div>
-        ${utilHtml ? '<div style="margin-bottom:6px;">'+utilHtml+'</div>' : ''}
+        ${utilAggregate ? '<div style="margin-bottom:6px;">'+utilAggregate+'</div>' : ''}
+        <div class="detail-section-label">Provisioned (Contract)</div>
         <ul class="detail-list">${listHtml}</ul>
+        ${utilDetailHtml}
       `;
 
       // Also color the source cell outline to match
