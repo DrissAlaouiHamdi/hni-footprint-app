@@ -67,6 +67,20 @@ body {
   white-space: nowrap;
 }
 
+.export-btn {
+  padding: 6px 16px;
+  background: #0176d3;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.export-btn:hover { background: #0161b1; }
+
 .meta-chip {
   cursor: pointer;
   padding: 2px 8px;
@@ -767,7 +781,10 @@ body {
         114 Total Provisioned Lines
       </div>
     </div>
-    <div class="header-badge">Utilization data: end of May – June 10, 2026</div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="header-badge">Utilization data: end of May – June 10, 2026</div>
+      <button class="export-btn" id="exportBtn">Export CSV</button>
+    </div>
   </div>
 </div>
 
@@ -1833,6 +1850,59 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('zeroUtilToggle').classList.remove('active');
     renderPills();
     applyFilters();
+  });
+
+  // Export CSV
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    const rows = [];
+    // Header row
+    rows.push(['Brand','Tenant ID','Product Name','Product Category','Provisioned Qty','AV Cloud','AV Product','AV Provisioned','AV Activated','AV Used','EU%']);
+
+    // For each footprint row, add utilization if available
+    DATA.forEach(row => {
+      const [brand, tenant, product, category, qty] = row;
+      const avCat = FOOTPRINT_TO_AV[category];
+      const brandUtil = UTIL_BY_BRAND[brand];
+      let avCloud = '', avProd = '', avP = '', avA = '', avU = '', euPct = '';
+
+      if (brandUtil && avCat && brandUtil[avCat]) {
+        avCloud = avCat;
+        euPct = brandUtil[avCat].eu + '%';
+      }
+
+      rows.push([brand, tenant, product, category, qty, avCloud, '', '', '', '', euPct]);
+    });
+
+    // Add a blank row then all AV utilization detail
+    rows.push([]);
+    rows.push(['--- UTILIZATION DETAIL (AV App) ---','','','','','','','','','','']);
+    rows.push(['Brand','','','','','AV Cloud','AV Product','Provisioned','Activated','Used','EU%']);
+
+    Object.entries(UTIL_BY_BRAND).forEach(([brand, cats]) => {
+      Object.entries(cats).forEach(([avCat, catData]) => {
+        catData.products.forEach(p => {
+          const eu = (p.p && p.u !== null) ? Math.round((p.u / p.p) * 100) + '%' : 'N/A';
+          const aVal = p.a !== null ? p.a : 'Null';
+          const uVal = p.u !== null ? p.u : 'Null';
+          rows.push([brand, '', '', '', '', avCat, p.t, p.p, aVal, uVal, eu]);
+        });
+      });
+    });
+
+    // Convert to CSV
+    const csv = rows.map(r => r.map(cell => {
+      const s = String(cell === undefined || cell === null ? '' : cell);
+      return s.includes(',') || s.includes('"') || s.includes('\n') ? '"' + s.replace(/"/g, '""') + '"' : s;
+    }).join(',')).join('\n');
+
+    // Download
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'HNI_Footprint_Utilization_Export.csv';
+    a.click();
+    URL.revokeObjectURL(url);
   });
 });
 </script>
