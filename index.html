@@ -805,7 +805,7 @@ body {
       <input type="range" class="util-slider" id="utilSlider" min="0" max="100" value="100">
       <span class="util-slider-val" id="utilSliderVal">≤ 100%</span>
     </span>
-    <span class="pill pill-whitespace" id="overUtilToggle" style="margin-left:8px;">Over 100% Util</span>
+    <span class="pill pill-whitespace" id="overUtilToggle" style="margin-left:8px;">≥ 90% Util</span>
     <span class="pill pill-whitespace" id="zeroUtilToggle">0% Util</span>
     <span class="pill pill-clear" id="clearAll">Clear All</span>
   </div>
@@ -1363,16 +1363,16 @@ function renderHeatmap() {
         const lightText = isLightColor(color, intensity);
         const cellEU = getBrandCatEU(brand, cat);
         const dimmedBySlider = (utilMaxPct < 100 && cellEU !== null && cellEU > utilMaxPct);
-        // Over 100% checks individual products, not just the aggregate
-        let hasOverProduct = false;
+        // Over 90% checks individual products
+        let hasHighProduct = false;
         if (overUtilMode) {
           const bUtil = UTIL_BY_BRAND[brand];
           const avC = FOOTPRINT_TO_AV[cat];
           if (bUtil && avC && bUtil[avC] && bUtil[avC].products) {
-            hasOverProduct = bUtil[avC].products.some(p => p.p > 0 && p.u !== null && (p.u / p.p) > 1);
+            hasHighProduct = bUtil[avC].products.some(p => p.p > 0 && p.u !== null && (p.u / p.p) >= 0.9);
           }
         }
-        const dimmedByOver = (overUtilMode && !hasOverProduct);
+        const dimmedByOver = (overUtilMode && !hasHighProduct);
         const dimmedByZero = (zeroUtilMode && (cellEU === null || cellEU !== 0));
         const dimmedByProduct = (discreteProductFilter && !prodList.some(p => p.name === discreteProductFilter));
         const dimmed = dimmedBySlider || dimmedByOver || dimmedByZero || dimmedByProduct;
