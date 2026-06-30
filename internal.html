@@ -13,14 +13,14 @@
 
         body {
             font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace;
-            background: #0f172a;
-            color: #e2e8f0;
+            background: #f1f5f9;
+            color: #1e293b;
             line-height: 1.5;
             padding: 24px 32px;
         }
 
         a {
-            color: #60a5fa;
+            color: #0176d3;
             text-decoration: none;
         }
 
@@ -30,26 +30,27 @@
 
         /* Header */
         .header {
-            border-bottom: 1px solid #334155;
-            padding-bottom: 20px;
+            background: #0b1c3f;
+            border-radius: 10px;
+            padding: 24px;
             margin-bottom: 32px;
         }
 
         .header h1 {
             font-size: 1.5rem;
-            color: #f8fafc;
+            color: #fff;
             margin-bottom: 4px;
         }
 
         .header .subtitle {
             font-size: 0.85rem;
-            color: #94a3b8;
+            color: #64748b;
             margin-bottom: 10px;
         }
 
         .header .badge {
             display: inline-block;
-            background: #1e293b;
+            background: #ffffff;
             border: 1px solid #475569;
             padding: 6px 14px;
             border-radius: 4px;
@@ -67,6 +68,8 @@
         /* Sections */
         .section {
             margin-bottom: 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            border-radius: 6px;
         }
 
         .section-header {
@@ -75,19 +78,19 @@
             gap: 10px;
             cursor: pointer;
             padding: 10px 14px;
-            background: #1e293b;
-            border: 1px solid #334155;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 6px 6px 0 0;
             user-select: none;
         }
 
         .section-header:hover {
-            background: #253347;
+            background: #f8fafc;
         }
 
         .section-header h2 {
             font-size: 1rem;
-            color: #f1f5f9;
+            color: #1e293b;
             font-weight: 600;
         }
 
@@ -98,11 +101,11 @@
         }
 
         .section-body {
-            border: 1px solid #334155;
+            border: 1px solid #e2e8f0;
             border-top: none;
             border-radius: 0 0 6px 6px;
             padding: 16px;
-            background: #0f172a;
+            background: #ffffff;
         }
 
         .section.collapsed .section-body {
@@ -121,8 +124,8 @@
         }
 
         .card {
-            background: #1e293b;
-            border: 1px solid #334155;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 6px;
             padding: 14px;
         }
@@ -139,7 +142,7 @@
 
         .card-meta {
             font-size: 0.75rem;
-            color: #94a3b8;
+            color: #64748b;
             margin-bottom: 4px;
         }
 
@@ -148,7 +151,7 @@
             color: #cbd5e1;
             font-style: italic;
             margin-top: 6px;
-            border-top: 1px solid #334155;
+            border-top: 1px solid #e2e8f0;
             padding-top: 6px;
         }
 
@@ -174,21 +177,21 @@
         .data-table th {
             text-align: left;
             padding: 8px 10px;
-            background: #1e293b;
-            color: #94a3b8;
+            background: #ffffff;
+            color: #64748b;
             font-weight: 600;
-            border-bottom: 1px solid #334155;
+            border-bottom: 1px solid #e2e8f0;
             white-space: nowrap;
         }
 
         .data-table td {
             padding: 8px 10px;
             border-bottom: 1px solid #1e293b;
-            color: #e2e8f0;
+            color: #334155;
         }
 
         .data-table tr:hover td {
-            background: #1e293b;
+            background: #ffffff;
         }
 
         .data-table .amount {
@@ -277,20 +280,20 @@
 
         .timeline-date {
             font-size: 0.75rem;
-            color: #94a3b8;
+            color: #64748b;
             font-weight: 600;
         }
 
         .timeline-desc {
             font-size: 0.8rem;
-            color: #e2e8f0;
+            color: #334155;
         }
 
         /* Footer */
         .footer {
             margin-top: 40px;
             padding-top: 16px;
-            border-top: 1px solid #334155;
+            border-top: 1px solid #e2e8f0;
             font-size: 0.7rem;
             color: #475569;
             text-align: center;
@@ -300,7 +303,7 @@
         .pipeline-total {
             margin-top: 12px;
             padding: 8px 14px;
-            background: #1e293b;
+            background: #ffffff;
             border-radius: 4px;
             font-size: 0.82rem;
             font-weight: 700;
@@ -694,7 +697,7 @@
                 </tr>
             </tbody>
         </table>
-        <div style="margin-top:16px;padding:12px 16px;background:#1a2744;border-radius:8px;border-left:4px solid #60a5fa;font-size:12px;color:#94a3b8;">
+        <div style="margin-top:16px;padding:12px 16px;background:#eff6ff;border-radius:8px;border-left:4px solid #0176d3;font-size:12px;color:#334155;">
             <strong style="color:#60a5fa;">Key Takeaway:</strong> The report and data are directionally aligned on risk (HNI = yellow, low adoption areas exist), but specific numbers diverge. The biggest correction: <strong style="color:#22c55e;">HNI Service Cloud is at 89% EU — not shelfware.</strong> Use AV data as the authoritative source for utilization claims in customer conversations.
         </div>
     </div>
